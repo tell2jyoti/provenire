@@ -1,0 +1,20 @@
+[project]
+name = "attestable-cli"
+version = "0.1.0"
+description = "Attestable — command-line wrapper around the detection engine (open core)."
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = ["attestable-engine"]
+
+# NOTE: the `attestable` console script (project.scripts) is added with feature F6,
+# once its entrypoint exists — it would reference product code that does not yet exist.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/attestable_cli"]
+
+[tool.uv.sources]
+attestable-engine = { workspace = true }

@@ -1,0 +1,17 @@
+[project]
+name = "attestable-control-plane"
+version = "0.1.0"
+description = "Attestable — mapping engine, packs, evidence, and API (commercial / proprietary)."
+requires-python = ">=3.11"
+license = "LicenseRef-Proprietary"
+dependencies = ["attestable-engine"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/attestable_control_plane"]
+
+[tool.uv.sources]
+attestable-engine = { workspace = true }

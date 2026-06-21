@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attestable — Technical Design &amp; Architecture (v1.0)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14202b;--ink-2:#243441;--paper:#ffffff;--bg:#eceff3;--hair:#d3dce3;
+    --muted:#5c6b78;--accent:#0b6e6b;--accent-bright:#14b8a6;
+    --crit:#b42318;--high:#c4320a;--med:#b54708;--ok:#067647;
+    --build:#067647;--buy:#0b6e6b;--neither:#7a8893;
+    --chip-ink:#0d2330;--chip-cyan:#7fe7df;--maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);margin:0;line-height:1.62;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .progress{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-bright));z-index:50;transition:width .1s linear;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+  .masthead{background:var(--ink);color:#eaf2f3;border-bottom:4px solid var(--accent-bright);}
+  .masthead .wrap{padding:38px 24px 30px;}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--chip-cyan);margin:0 0 14px;}
+  .masthead h1{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(30px,5vw,52px);line-height:1.04;margin:0 0 10px;letter-spacing:-.01em;}
+  .masthead .tagline{font-size:clamp(16px,2.3vw,20px);color:#b9cace;max-width:64ch;margin:0 0 26px;}
+  .docmeta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:8px;overflow:hidden;margin-top:6px;}
+  .docmeta div{background:var(--ink-2);padding:12px 14px;}
+  .docmeta dt{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8aa0a6;margin:0 0 4px;}
+  .docmeta dd{margin:0;font-size:14px;font-weight:500;color:#eaf2f3;}
+  .status-pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:rgba(20,184,166,.15);color:var(--chip-cyan);border:1px solid rgba(127,231,223,.35);}
+  .layout{display:grid;grid-template-columns:248px 1fr;gap:48px;align-items:start;padding-top:40px;}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13.5px;border-left:2px solid var(--hair);padding-left:18px;}
+  nav.toc p{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;}
+  nav.toc a{display:block;color:var(--ink-2);text-decoration:none;padding:4px 0;border-left:2px solid transparent;margin-left:-20px;padding-left:18px;transition:.15s;}
+  nav.toc a:hover{color:var(--accent);border-left-color:var(--accent-bright);}
+  nav.toc a .n{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:11px;margin-right:7px;}
+  main{min-width:0;background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:8px 44px 56px;}
+  section{padding-top:30px;scroll-margin-top:20px;}
+  section + section{border-top:1px solid var(--hair);margin-top:8px;}
+  .sec-num{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--accent);}
+  h2{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;letter-spacing:-.01em;margin:6px 0 18px;line-height:1.15;color:var(--ink);}
+  h3{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:18px;margin:28px 0 10px;color:var(--ink-2);}
+  h4{font-size:14px;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px;}
+  p{margin:0 0 14px;}
+  ul,ol{margin:0 0 16px;padding-left:22px;}
+  li{margin-bottom:7px;}
+  strong{font-weight:600;}
+  code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:#eef3f4;padding:1.5px 6px;border-radius:4px;color:var(--ink-2);}
+  pre{background:var(--chip-ink);color:#dbeeec;border-radius:8px;padding:16px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.55;margin:14px 0;}
+  pre .k{color:var(--chip-cyan);}
+  pre .c{color:#7a96a0;}
+  .lead{font-size:18px;color:var(--ink-2);}
+  .rid{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--accent);}
+  .ctrl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:500;background:var(--chip-ink);color:var(--chip-cyan);padding:2px 7px;border-radius:4px;white-space:nowrap;display:inline-block;}
+  .sev{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;color:#fff;}
+  .sev.crit{background:var(--crit);}.sev.high{background:var(--high);}.sev.med{background:var(--med);}.sev.ok{background:var(--ok);}
+  .dec{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:4px;color:#fff;white-space:nowrap;}
+  .dec.build{background:var(--build);}.dec.buy{background:var(--buy);}.dec.neither{background:var(--neither);}
+  .tbl-scroll{overflow-x:auto;margin:18px 0;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--paper);min-width:580px;}
+  th,td{border:1px solid var(--hair);padding:9px 11px;text-align:left;vertical-align:top;}
+  thead th{background:#f3f6f8;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  tbody tr:nth-child(even){background:#fafcfc;}
+  td.r{text-align:right;font-family:"IBM Plex Mono",monospace;}
+  .callout{border:1px solid var(--hair);border-left:4px solid var(--accent);background:#f4faf9;padding:14px 18px;border-radius:0 8px 8px 0;margin:18px 0;}
+  .callout.warn{border-left-color:var(--high);background:#fdf6f2;}
+  .callout.qa{border-left-color:var(--accent-bright);background:#f0fdfa;}
+  .callout .label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--accent);margin:0 0 6px;}
+  .callout.warn .label{color:var(--high);}
+  .callout.qa .label{color:#0d8a82;}
+  .diagram{border:1px solid var(--hair);border-radius:10px;background:#fbfdfd;padding:10px;margin:18px 0;overflow-x:auto;}
+  .footer{margin-top:46px;padding-top:20px;border-top:1px solid var(--hair);font-size:12.5px;color:var(--muted);}
+  .footer code{background:none;padding:0;color:var(--muted);}
+  @media (max-width:880px){.layout{grid-template-columns:1fr;gap:0;}nav.toc{display:none;}main{padding:8px 22px 44px;}}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.progress{transition:none;}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Technical Design Document · System Architecture · API Spec</p>
+    <h1>Attestable — TDD</h1>
+    <p class="tagline">How the MCP compliance-evidence platform is built and deployed: a build-the-core / buy-the-rest architecture on a single AWS box, costed to stay free at launch.</p>
+    <dl class="docmeta">
+      <div><dt>Version</dt><dd>1.1 (pack-based)</dd></div>
+      <div><dt>Status</dt><dd><span class="status-pill">QA-PASSED · FOR REVIEW</span></dd></div>
+      <div><dt>Companion</dt><dd>PRD v1.0</dd></div>
+      <div><dt>Phase</dt><dd>1 — Free-tier launch</dd></div>
+      <div><dt>Cloud</dt><dd>AWS · EC2</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="layout">
+
+  <nav class="toc">
+    <p>Contents</p>
+    <a href="#s1"><span class="n">01</span>Scope &amp; context</a>
+    <a href="#s2"><span class="n">02</span>Design principles</a>
+    <a href="#s3"><span class="n">03</span>System architecture</a>
+    <a href="#s4"><span class="n">04</span>Buy vs build</a>
+    <a href="#s5"><span class="n">05</span>AWS topology (Phase 1)</a>
+    <a href="#s6"><span class="n">06</span>Cost &amp; budget</a>
+    <a href="#s7"><span class="n">07</span>Scanner engine (build)</a>
+    <a href="#s8"><span class="n">08</span>Mapping &amp; evidence</a>
+    <a href="#s9"><span class="n">09</span>Data &amp; persistence</a>
+    <a href="#s10"><span class="n">10</span>API specification</a>
+    <a href="#s11"><span class="n">11</span>Security architecture</a>
+    <a href="#s12"><span class="n">12</span>Reliability &amp; scaling</a>
+    <a href="#s13"><span class="n">13</span>Observability &amp; CI/CD</a>
+    <a href="#s14"><span class="n">14</span>Risks, QA log &amp; OQs</a>
+  </nav>
+
+  <main>
+
+  <section id="s1">
+    <span class="sec-num">SECTION 01</span>
+    <h2>Scope &amp; context</h2>
+    <p class="lead">This document specifies how Attestable (see PRD v1.1) is engineered and deployed for <strong>Phase 1</strong>: the free, open MCP security scanner plus the foundations of the paid control plane.</p>
+    <p>It makes the explicit buy-vs-build decisions, selects AWS components, costs the deployment, defines the scanner engine and API, and sets the security and reliability posture. Phase 1 is <strong>framework-neutral</strong>: it ships the scanner plus a single generic <strong>baseline</strong> mapping pack. The mapping engine is data-driven, so Phase 2/3 features (named-framework packs, continuous monitoring, enforcement proxy) are designed for and add as <em>data</em>, not as engine rewrites. The governing constraints from the owner are honoured throughout: <em>EC2 for dev and prod; build only the core engine; buy the rest; do not over-invest in load balancing or observability; stay in budget so the free tier can ship.</em></p>
+    <div class="callout qa">
+      <p class="label">v1.1 amendment</p>
+      <p style="margin:0;">Revised for the horizontal-first decision: the mapping layer is now a <strong>data-driven pack engine</strong> with a hard detection/mapping boundary. §08 (mapping subsystem), §04 (buy-vs-build), §07 (engine emits neutral findings), §09 (data model uses pack id/version) and §10 (evidence endpoint takes packs) carry the change.</p>
+    </div>
+  </section>
+
+  <section id="s2">
+    <span class="sec-num">SECTION 02</span>
+    <h2>Design principles</h2>
+    <ul>
+      <li><strong>Build the moat, rent the plumbing.</strong> Engineering effort goes only into the scanner engine, the control-mapping engine, and evidence generation — the parts no vendor sells. Everything generic is a managed service or off-the-shelf.</li>
+      <li><strong>Budget is a hard constraint, not an aspiration.</strong> Phase 1 must run for the price of one small instance so the scanner can be free. Any component that adds a fixed monthly fee must justify itself or be deferred.</li>
+      <li><strong>Don't gold-plate the free tier.</strong> The free/public tier accepts a single box and best-effort uptime. High availability, autoscaling, and load balancing are deferred to the paid Compliance tier where they're paid for.</li>
+      <li><strong>Deterministic by default.</strong> The free engine uses no LLM, so it has zero per-scan cost and no data-egress risk. Models are an opt-in, paid-tier layer.</li>
+      <li><strong>Security is a Phase-1 requirement, not a later hardening pass.</strong> A scanner that dials arbitrary URLs is itself an attack tool; SSRF defence ships in v1 (see §11).</li>
+    </ul>
+  </section>
+
+  <section id="s3">
+    <span class="sec-num">SECTION 03</span>
+    <h2>System architecture</h2>
+    <p>Logical view of Phase 1. The portal UI is static and hosted off-box; one EC2 instance runs the API, engine, and reverse proxy; managed services hold state. Target MCP servers are reached only through a restricted-egress path.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 920 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Phase 1 architecture diagram" style="width:100%;height:auto;font-family:'IBM Plex Mono',monospace;">
+        <defs>
+          <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0b6e6b"/></marker>
+        </defs>
+        <style>
+          .box{fill:#ffffff;stroke:#0b6e6b;stroke-width:1.5;rx:8;}
+          .ec2{fill:#f0fdfa;stroke:#0b6e6b;stroke-width:1.5;}
+          .ext{fill:#fbfdfd;stroke:#7a8893;stroke-width:1.3;stroke-dasharray:4 3;}
+          .lab{font-size:12px;fill:#14202b;font-weight:600;}
+          .sub{font-size:10px;fill:#5c6b78;}
+          .ln{stroke:#0b6e6b;stroke-width:1.5;fill:none;marker-end:url(#arr);}
+          .tag{font-size:9px;fill:#0b6e6b;}
+        </style>
+        <!-- user + portal -->
+        <rect class="box" x="12" y="150" width="120" height="54" rx="8"/>
+        <text class="lab" x="72" y="173" text-anchor="middle">User</text>
+        <text class="sub" x="72" y="189" text-anchor="middle">browser / CLI</text>
+        <rect class="box" x="172" y="150" width="130" height="54" rx="8"/>
+        <text class="lab" x="237" y="173" text-anchor="middle">Portal UI</text>
+        <text class="sub" x="237" y="189" text-anchor="middle">Netlify (static)</text>
+        <!-- EC2 envelope -->
+        <rect class="ec2" x="342" y="40" width="300" height="280" rx="12"/>
+        <text class="tag" x="356" y="58">EC2 t4g.small · Docker Compose</text>
+        <rect class="box" x="362" y="72" width="260" height="46" rx="8"/>
+        <text class="lab" x="492" y="92" text-anchor="middle">Caddy — reverse proxy + auto-TLS</text>
+        <text class="sub" x="492" y="108" text-anchor="middle">(no ALB in Phase 1)</text>
+        <rect class="box" x="362" y="134" width="125" height="58" rx="8"/>
+        <text class="lab" x="424" y="158" text-anchor="middle">Scanner API</text>
+        <text class="sub" x="424" y="174" text-anchor="middle">FastAPI</text>
+        <rect class="box" x="497" y="134" width="125" height="58" rx="8"/>
+        <text class="lab" x="559" y="158" text-anchor="middle">Control API</text>
+        <text class="sub" x="559" y="174" text-anchor="middle">FastAPI</text>
+        <rect class="box" x="362" y="208" width="260" height="58" rx="8"/>
+        <text class="lab" x="492" y="232" text-anchor="middle">Engine — connect · enumerate · detect · map</text>
+        <text class="sub" x="492" y="248" text-anchor="middle">MCP SDK client · rules · YARA</text>
+        <text class="tag" x="362" y="296">restricted egress (public-only, no metadata/RFC1918)</text>
+        <!-- managed services -->
+        <rect class="box" x="690" y="86" width="116" height="48" rx="8"/>
+        <text class="lab" x="748" y="107" text-anchor="middle">Neon</text>
+        <text class="sub" x="748" y="123" text-anchor="middle">Postgres (free)</text>
+        <rect class="box" x="690" y="150" width="116" height="48" rx="8"/>
+        <text class="lab" x="748" y="171" text-anchor="middle">S3</text>
+        <text class="sub" x="748" y="187" text-anchor="middle">reports/evidence</text>
+        <rect class="box" x="690" y="214" width="116" height="48" rx="8"/>
+        <text class="lab" x="748" y="235" text-anchor="middle">CloudWatch</text>
+        <text class="sub" x="748" y="251" text-anchor="middle">logs (basic)</text>
+        <!-- target servers -->
+        <rect class="ext" x="838" y="150" width="70" height="60" rx="8"/>
+        <text class="lab" x="873" y="172" text-anchor="middle" font-size="10">Target</text>
+        <text class="sub" x="873" y="186" text-anchor="middle">MCP</text>
+        <text class="sub" x="873" y="198" text-anchor="middle">servers</text>
+        <!-- lines -->
+        <path class="ln" d="M132,177 L168,177"/>
+        <path class="ln" d="M302,177 L358,160"/>
+        <path class="ln" d="M424,192 L424,204"/>
+        <path class="ln" d="M559,192 L520,206"/>
+        <path class="ln" d="M622,118 L686,108"/>
+        <path class="ln" d="M622,170 L686,172"/>
+        <path class="ln" d="M622,240 L686,236"/>
+        <path class="ln" d="M622,237 L834,200"/>
+      </svg>
+    </div>
+    <p><strong>Request flow (scan):</strong> browser → Netlify UI → Caddy → Scanner API → Engine connects to the target over streamable-HTTP, enumerates tools/resources/prompts, runs detection, returns a scored result; report artifact written to S3, run metadata to Postgres. The CLI bypasses the portal entirely and runs the same engine locally (the only path that can scan <code>stdio</code> servers and private/regulated servers).</p>
+  </section>
+
+  <section id="s4">
+    <span class="sec-num">SECTION 04</span>
+    <h2>Buy vs build decision matrix</h2>
+    <p>Decisions: <span class="dec build">BUILD</span> core IP we own · <span class="dec buy">BUY</span> managed / off-the-shelf · <span class="dec neither">NEITHER</span> deferred or covered for free in Phase 1.</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Concern</th><th>Decision</th><th>Choice (Phase 1)</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>MCP scanner engine</td><td><span class="dec build">BUILD</span></td><td>Python + official MCP SDK</td><td>The product. No one sells control-mapped MCP scanning.</td></tr>
+        <tr><td>Detection rules / mapping engine / packs / evidence</td><td><span class="dec build">BUILD</span></td><td>Rule + YARA engine; data-driven mapping engine + baseline pack</td><td>Build the framework-neutral engine and one pack; further packs are maintained data, not new code.</td></tr>
+        <tr><td>CLI</td><td><span class="dec build">BUILD</span></td><td>Single binary / pip package</td><td>Adoption wedge; only path for stdio &amp; private servers.</td></tr>
+        <tr><td>API framework</td><td><span class="dec buy">BUY</span></td><td>FastAPI (OSS)</td><td>Thin wrapper around the engine; don't reinvent.</td></tr>
+        <tr><td>Compute host</td><td><span class="dec buy">BUY</span></td><td>EC2 t4g.small (Graviton)</td><td>Owner-mandated; cheapest viable always-on box.</td></tr>
+        <tr><td>TLS + routing</td><td><span class="dec neither">NEITHER</span></td><td>Caddy on the box (auto-HTTPS)</td><td>Free, zero-ops; avoids ALB's fixed monthly cost.</td></tr>
+        <tr><td>Load balancer</td><td><span class="dec neither">NEITHER</span></td><td>Deferred → ALB at scale</td><td>Single box needs none; per owner constraint.</td></tr>
+        <tr><td>Database</td><td><span class="dec buy">BUY</span></td><td>Neon serverless Postgres (free tier)</td><td>Managed, auto-backup, $0; no DB ops.</td></tr>
+        <tr><td>Object storage</td><td><span class="dec buy">BUY</span></td><td>Amazon S3</td><td>Reports/evidence; pennies, versioned.</td></tr>
+        <tr><td>Frontend hosting</td><td><span class="dec buy">BUY</span></td><td>Netlify (free, already connected)</td><td>Static UI; global CDN free.</td></tr>
+        <tr><td>Secrets / config</td><td><span class="dec buy">BUY</span></td><td>SSM Parameter Store</td><td>Free tier; avoids Secrets Manager per-secret fee.</td></tr>
+        <tr><td>Observability</td><td><span class="dec buy">BUY</span></td><td>CloudWatch logs + free uptime monitor</td><td>Buy, don't build; minimal footprint per constraint.</td></tr>
+        <tr><td>CI/CD</td><td><span class="dec buy">BUY</span></td><td>GitHub Actions → deploy via SSM</td><td>Free tier; no Jenkins to run.</td></tr>
+        <tr><td>Auth / accounts</td><td><span class="dec buy">BUY</span></td><td>Deferred → Cognito free tier (paid tiers)</td><td>Free scanner is anonymous; add when accounts needed.</td></tr>
+        <tr><td>Scheduling (drift scans)</td><td><span class="dec buy">BUY</span></td><td>Deferred → EventBridge Scheduler (P2)</td><td>Phase-1 scans are on-demand only.</td></tr>
+        <tr><td>Async queue</td><td><span class="dec neither">NEITHER</span></td><td>Deferred → SQS (when needed)</td><td>Sub-10s synchronous scans need no queue yet.</td></tr>
+        <tr><td>HA / multi-AZ / autoscaling</td><td><span class="dec neither">NEITHER</span></td><td>Deferred → Compliance tier</td><td>Don't gold-plate a free tier.</td></tr>
+        <tr><td>Semantic detection (LLM)</td><td><span class="dec buy">BUY</span></td><td>Deferred → model API / local model (paid)</td><td>Opt-in only; keeps free tier zero-cost &amp; no-egress.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s5">
+    <span class="sec-num">SECTION 05</span>
+    <h2>AWS deployment topology — Phase 1</h2>
+    <ul>
+      <li><strong>Region:</strong> <code>ap-south-1</code> (Mumbai) for owner proximity, or <code>us-east-1</code> for lowest list price. Pricing below uses us-east-1; Mumbai runs ~10–15% higher.</li>
+      <li><strong>Instance:</strong> one EC2 <code>t4g.small</code> (2 vCPU / 2 GiB, Graviton/ARM). Python/Node run on ARM unchanged. Drop to <code>t4g.micro</code> if traffic is light; size up vertically before ever adding a second box.</li>
+      <li><strong>On the box (Docker Compose):</strong> Caddy (TLS + routing) · Scanner API · Control API · Engine workers. One <code>docker compose up</code> is the entire deploy.</li>
+      <li><strong>Storage:</strong> 20 GB <code>gp3</code> EBS root; nightly EBS snapshot (cheap). Reports/evidence in S3 with versioning on.</li>
+      <li><strong>State:</strong> Neon Postgres (external, managed). Phase-1 hosted DB holds <em>public-scan data only</em> — no regulated data ever reaches hosted infra (that path is CLI/self-host).</li>
+      <li><strong>Network:</strong> security group exposes only 80/443 inbound; the scan worker runs with egress filtered to deny link-local (<code>169.254.169.254</code>) and RFC-1918 ranges (see §11).</li>
+      <li><strong>Identity:</strong> instance role with least-privilege IAM (S3 prefix + SSM read + CloudWatch put only). IMDSv2 enforced, hop limit 1.</li>
+    </ul>
+  </section>
+
+  <section id="s6">
+    <span class="sec-num">SECTION 06</span>
+    <h2>Cost &amp; budget — Phase 1 (monthly, us-east-1)</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Item</th><th>Basis</th><th class="r">On-demand</th><th class="r">Reserved 1-yr</th></tr></thead>
+      <tbody>
+        <tr><td>EC2 t4g.small</td><td>2 vCPU / 2 GiB, always-on</td><td class="r">$12.26</td><td class="r">$7.17</td></tr>
+        <tr><td>EBS gp3 root</td><td>20 GB @ $0.08/GB</td><td class="r">$1.60</td><td class="r">$1.60</td></tr>
+        <tr><td>S3 + requests</td><td>&lt;5 GB, low ops (free-tier early)</td><td class="r">$0–1</td><td class="r">$0–1</td></tr>
+        <tr><td>CloudWatch logs</td><td>basic ingestion</td><td class="r">$0–2</td><td class="r">$0–2</td></tr>
+        <tr><td>Data transfer out</td><td>low volume @ $0.09/GB</td><td class="r">$1–3</td><td class="r">$1–3</td></tr>
+        <tr><td>EBS snapshots</td><td>incremental</td><td class="r">$0–1</td><td class="r">$0–1</td></tr>
+        <tr><td>Neon Postgres</td><td>free tier</td><td class="r">$0</td><td class="r">$0</td></tr>
+        <tr><td>Netlify · GitHub Actions · SSM</td><td>free tiers</td><td class="r">$0</td><td class="r">$0</td></tr>
+        <tr><td><strong>Total (typical)</strong></td><td></td><td class="r"><strong>≈ $16–20</strong></td><td class="r"><strong>≈ $11–15</strong></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout">
+      <p class="label">Budget verdict</p>
+      <p style="margin:0;">Phase 1 lands at <strong>~$16–20/mo on-demand</strong> (less reserved), comfortably inside "ship it free." A new AWS account's 12-month free tier (750 micro-hrs + 30 GB EBS) makes year one cheaper still. Recommendation: start <strong>on-demand</strong> (no commitment pre-PMF); switch to a Savings Plan once traffic is steady. Mumbai region adds ~10–15%.</p>
+    </div>
+    <p>The only cost that can scale unexpectedly is the optional <strong>semantic layer</strong> — fenced to paid tiers, off by default, and cached by manifest hash so unchanged tools never re-invoke a model.</p>
+  </section>
+
+  <section id="s7">
+    <span class="sec-num">SECTION 07</span>
+    <h2>Scanner engine — the build</h2>
+    <h3>Pipeline</h3>
+    <ol>
+      <li><strong>Connect</strong> — MCP SDK <code>ClientSession</code> over <code>streamable_http</code> (hosted) or <code>stdio</code> (CLI only). <code>initialize()</code> handshake with timeout.</li>
+      <li><strong>Enumerate</strong> — <code>list_tools()</code>, <code>list_resources()</code>, <code>list_prompts()</code>. Scanning all three, not tools alone, is a deliberate coverage choice.</li>
+      <li><strong>Normalize</strong> — capture each tool's name, description, input schema; compute a stable manifest hash for drift detection.</li>
+      <li><strong>Detect</strong> — deterministic rules + YARA-style patterns for: poisoning/hidden-directive text, invisible unicode, exfil patterns, over-privileged primitives (shell/file/SQL/egress), missing/unbounded schema validation, tool-name shadowing/collision.</li>
+      <li><strong>Score</strong> — normalized severity + confidence + rationale per finding; "intended behaviour" suppression to hold signal.</li>
+      <li><strong>Emit</strong> — JSON result + rendered HTML report; persist run + hash; (paid) hand to mapping engine.</li>
+    </ol>
+    <pre><span class="c"># engine connect + enumerate (streamable-HTTP, hosted path)</span>
+<span class="k">async with</span> streamable_http_client(url) <span class="k">as</span> (r, w, _):
+    <span class="k">async with</span> ClientSession(r, w) <span class="k">as</span> s:
+        <span class="k">await</span> s.initialize()
+        tools     = <span class="k">await</span> s.list_tools()
+        resources = <span class="k">await</span> s.list_resources()
+        prompts   = <span class="k">await</span> s.list_prompts()
+        <span class="c"># → normalize → detect → score → emit</span></pre>
+    <p>The engine emits <strong>framework-neutral findings</strong> — it never names a regulation. Engine, rules, and CLI are <strong>open source</strong>; the mapping engine, the packs, the evidence store, and the reputation index are the <strong>commercial control plane</strong> (open-core boundary from PRD §10).</p>
+  </section>
+
+  <section id="s8">
+    <span class="sec-num">SECTION 08</span>
+    <h2>Mapping &amp; evidence subsystem</h2>
+    <p>Two layers, deliberately decoupled, so domains are added as data:</p>
+    <ul>
+      <li><strong>Detection (framework-neutral).</strong> The engine emits <code>Finding</code> records keyed by a stable <code>finding_type</code> (e.g. <code>tool.poisoning</code>, <code>tool.over_privilege</code>, <code>audit.no_immutable_log</code>). No regulation is referenced here.</li>
+      <li><strong>Mapping (data-driven packs).</strong> The mapping engine loads a versioned <strong>pack</strong> — a declarative file that maps <code>finding_type</code> → one or more controls. It emits <code>ControlState</code> records. Swapping or adding a pack changes the output; the engine code does not change.</li>
+    </ul>
+    <p>Phase 1 ships exactly one pack — <code>baseline</code> — proving the architecture end to end. SOC 2, HIPAA, PCI-DSS and ISO packs are added in Phases 2–3 as new files under <code>packs/</code>.</p>
+    <pre><span class="c"># packs/baseline.yaml  (Phase 1)  — declarative, no engine code</span>
+<span class="k">pack</span>: baseline
+<span class="k">version</span>: 1
+<span class="k">maps</span>:
+  - <span class="k">finding_type</span>: tool.over_privilege
+    <span class="k">control</span>: baseline.least_privilege
+    <span class="k">status_when_present</span>: fail
+  - <span class="k">finding_type</span>: audit.no_immutable_log
+    <span class="k">control</span>: baseline.audit_logging
+    <span class="k">status_when_present</span>: fail
+<span class="c"># packs/soc2.yaml (Phase 2) reuses the same finding_types → CC6.1, CC7.2 …</span></pre>
+    <ul>
+      <li>Runtime mapping is <strong>deterministic</strong> — auditors require reproducibility. Any LLM help is confined to <em>authoring</em> packs offline, never to producing a live assertion.</li>
+      <li>Both <em>failing</em> and <em>passing</em> controls produce evidence (auditors need proof of what holds, not only gaps).</li>
+      <li>Packs are versioned; each <code>EvidencePack</code> records the pack id + version it was generated against, so evidence is traceable as packs evolve.</li>
+      <li>Evidence packs are export artifacts (JSON + rendered PDF/HTML) suitable for GRC import and auditor hand-off.</li>
+    </ul>
+  </section>
+
+  <section id="s9">
+    <span class="sec-num">SECTION 09</span>
+    <h2>Data model &amp; persistence</h2>
+    <h3>Postgres (Neon) — metadata &amp; state</h3>
+    <pre><span class="k">server</span>(id, endpoint, transport, owner, trust_state, created_at)
+<span class="k">scan_run</span>(id, server_id, actor, trigger, manifest_hash, duration_ms, created_at)
+<span class="k">tool</span>(id, scan_run_id, name, description, schema_json, privilege_flags, version_hash)
+<span class="k">finding</span>(id, scan_run_id, entity_ref, finding_type, severity, confidence, rationale)
+<span class="k">control_state</span>(id, scan_run_id, pack_id, pack_version, control_id, status, evidence_ref, asserted_at)
+<span class="k">evidence_pack</span>(id, scope, pack_id, pack_version, signature, s3_key, generated_at)</pre>
+    <h3>S3 — artifacts</h3>
+    <ul>
+      <li><code>reports/{scan_id}.html|json</code> — human + machine reports.</li>
+      <li><code>evidence/{pack_id}.zip</code> — signed evidence bundles (versioning on).</li>
+      <li><code>manifests/{server_hash}/{ts}.json</code> — manifest snapshots for drift diffing.</li>
+    </ul>
+    <p>Append-only audit semantics: <code>scan_run</code>, <code>finding</code>, <code>control_state</code> are never updated in place — re-scans insert new rows, preserving the timeline an auditor needs.</p>
+  </section>
+
+  <section id="s10">
+    <span class="sec-num">SECTION 10</span>
+    <h2>API specification (v1)</h2>
+    <p><strong>Base:</strong> <code>https://api.attestable.dev/v1</code> · <strong>Auth:</strong> public endpoints are anonymous + rate-limited (free portal); account endpoints use <code>Authorization: Bearer &lt;api_key&gt;</code>. <strong>Format:</strong> JSON. <strong>Rate limit (free):</strong> e.g. 30 scans/hr/IP, returned via <code>X-RateLimit-*</code> headers.</p>
+
+    <h3>POST /scan — start a scan</h3>
+    <pre><span class="c">// request</span>
+{ <span class="k">"target"</span>: <span class="k">"https://example.com/mcp"</span>,
+  <span class="k">"transport"</span>: <span class="k">"streamable_http"</span>,   <span class="c">// hosted: http only; stdio = CLI</span>
+  <span class="k">"mode"</span>: <span class="k">"deterministic"</span> }        <span class="c">// "semantic" = paid, opt-in</span>
+
+<span class="c">// 200 response (synchronous, &lt;10s)</span>
+{ <span class="k">"scan_id"</span>: <span class="k">"scn_a1b2"</span>,
+  <span class="k">"server_hash"</span>: <span class="k">"sha256:…"</span>,
+  <span class="k">"summary"</span>: { <span class="k">"critical"</span>:1, <span class="k">"high"</span>:2, <span class="k">"medium"</span>:0, <span class="k">"pass"</span>:14 },
+  <span class="k">"findings"</span>: [ { <span class="k">"id"</span>:<span class="k">"f1"</span>, <span class="k">"type"</span>:<span class="k">"tool_poisoning"</span>,
+      <span class="k">"severity"</span>:<span class="k">"critical"</span>, <span class="k">"confidence"</span>:0.92,
+      <span class="k">"entity"</span>:<span class="k">"tool:send_mail"</span>, <span class="k">"rationale"</span>:<span class="k">"hidden directive in description"</span> } ],
+  <span class="k">"report_url"</span>: <span class="k">"https://…/reports/scn_a1b2.html"</span> }</pre>
+
+    <h3>Endpoint catalogue</h3>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Method · Path</th><th>Purpose</th><th>Tier</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST /scan</code></td><td>Run a scan; returns findings synchronously</td><td>Free</td></tr>
+        <tr><td><code>GET /scan/{id}</code></td><td>Retrieve a prior scan result</td><td>Free</td></tr>
+        <tr><td><code>GET /scan/{id}/report</code></td><td>HTML/JSON report artifact</td><td>Free</td></tr>
+        <tr><td><code>POST /scan/{id}/evidence</code></td><td>Generate control-mapped evidence pack <code>{packs:[…]}</code> (defaults to <code>baseline</code>)</td><td>Compliance</td></tr>
+        <tr><td><code>GET /servers/{hash}/reputation</code></td><td>Reputation/known-bad lookup</td><td>Team+</td></tr>
+        <tr><td><code>POST /monitors</code></td><td>Register drift/rug-pull monitor on a server</td><td>Team+</td></tr>
+        <tr><td><code>GET /monitors/{id}/events</code></td><td>Drift events / re-review triggers</td><td>Team+</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h4>Error model</h4>
+    <pre>{ <span class="k">"error"</span>: { <span class="k">"code"</span>:<span class="k">"target_unreachable"</span>,
+            <span class="k">"message"</span>:<span class="k">"MCP handshake timed out after 10s"</span> } }</pre>
+    <p>Codes: <code>400 invalid_target</code> · <code>403 blocked_target</code> (private/metadata IP) · <code>408 target_unreachable</code> · <code>429 rate_limited</code> · <code>402 tier_required</code> (evidence/monitor on free).</p>
+  </section>
+
+  <section id="s11">
+    <span class="sec-num">SECTION 11</span>
+    <h2>Security architecture</h2>
+    <div class="callout warn">
+      <p class="label">Primary threat — SSRF via the scanner itself</p>
+      <p style="margin:0;">A service that connects to user-supplied URLs is a server-side request forgery weapon if unguarded: an attacker could point it at the EC2 metadata endpoint or internal hosts. This is a <span class="sev crit">P0</span> mitigation, shipping in v1.</p>
+    </div>
+    <ul>
+      <li><strong>Block dangerous targets</strong> — reject link-local (<code>169.254.0.0/16</code>, incl. metadata), loopback, and RFC-1918 ranges at request validation; re-resolve DNS and re-check to defeat rebinding.</li>
+      <li><strong>Constrain egress</strong> — the scan worker's egress is filtered to public destinations only; it cannot reach the instance metadata service or VPC-internal addresses.</li>
+      <li><strong>IMDSv2 enforced</strong>, hop limit 1 — even a successful SSRF cannot read instance credentials.</li>
+      <li><strong>Hard timeouts &amp; concurrency caps</strong> — 10s per scan, bounded parallelism; a slow/malicious target cannot exhaust the box.</li>
+      <li><strong>Least-privilege IAM</strong> — instance role limited to its S3 prefix, SSM read, CloudWatch put; nothing else.</li>
+      <li><strong>Secrets</strong> in SSM Parameter Store, never in images or env files in the repo.</li>
+      <li><strong>Data boundary</strong> — hosted service scans public servers only; private/regulated servers use the CLI/self-host path so manifests never leave the customer's network.</li>
+    </ul>
+  </section>
+
+  <section id="s12">
+    <span class="sec-num">SECTION 12</span>
+    <h2>Reliability &amp; scaling — explicit trade-offs</h2>
+    <p>The free tier deliberately runs as a single box with best-effort uptime. This is a conscious decision, not an oversight: the PRD's reliability and high-availability guarantees attach to the paid Compliance tier, which is where customers pay for them.</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Concern</th><th>Phase 1 (free)</th><th>Scale path (paid)</th></tr></thead>
+      <tbody>
+        <tr><td>Availability</td><td>Single EC2, best-effort</td><td>Multi-AZ, 2+ instances behind ALB</td></tr>
+        <tr><td>Load balancing</td><td>Caddy on box</td><td>ALB introduced only here</td></tr>
+        <tr><td>Scaling</td><td>Vertical (resize instance)</td><td>Horizontal + autoscaling group</td></tr>
+        <tr><td>Async work</td><td>Synchronous &lt;10s</td><td>SQS + worker pool</td></tr>
+        <tr><td>DB</td><td>Neon free tier</td><td>Neon paid / RDS Multi-AZ</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s13">
+    <span class="sec-num">SECTION 13</span>
+    <h2>Observability &amp; CI/CD</h2>
+    <ul>
+      <li><strong>Observability (bought, minimal):</strong> CloudWatch for app logs + basic metrics; a free external uptime monitor (UptimeRobot / Better Stack) for the public endpoint. No custom dashboards, no self-hosted Grafana in Phase 1 — per the no-over-investment constraint.</li>
+      <li><strong>CI/CD:</strong> GitHub Actions builds and pushes the Docker image, then deploys to EC2 via SSM Run Command (no inbound SSH needed). One workflow, free tier.</li>
+      <li><strong>Environments:</strong> dev runs the same Docker Compose locally or on a second cheap instance; prod is the t4g.small. Identical compose file = no environment drift.</li>
+    </ul>
+  </section>
+
+  <section id="s14">
+    <span class="sec-num">SECTION 14</span>
+    <h2>Risks, QA review log &amp; open questions</h2>
+    <h4>QA review log — caught &amp; resolved before v1.0</h4>
+    <div class="callout qa"><p class="label">QA-T1 · resolved</p><p style="margin:0;">SSRF: hosted scanner could be aimed at metadata/internal hosts. → §11 mitigations made P0 (IP blocking, egress filter, IMDSv2 hop-limit 1).</p></div>
+    <div class="callout qa"><p class="label">QA-T2 · resolved</p><p style="margin:0;">stdio servers run as local subprocesses and can't be scanned remotely. → Hosted = streamable-HTTP/SSE only; stdio is CLI-only (also the private-server path).</p></div>
+    <div class="callout qa"><p class="label">QA-T3 · resolved</p><p style="margin:0;">Single EC2 contradicts PRD reliability NFRs. → Explicit trade-off (§12): free tier best-effort; HA is a paid-tier feature.</p></div>
+    <div class="callout qa"><p class="label">QA-T4 · resolved</p><p style="margin:0;">Synchronous scan could hang a worker. → 10s hard timeout + concurrency cap; queue deferred to scale path.</p></div>
+    <div class="callout qa"><p class="label">QA-T5 · resolved</p><p style="margin:0;">1-yr reserved commitment pre-PMF is premature. → Budget defaults to on-demand; Savings Plan only after steady traffic.</p></div>
+    <div class="callout qa"><p class="label">QA-T6 · resolved</p><p style="margin:0;">Managed DB egress vs regulated data. → Phase-1 hosted DB stores public-scan data only; regulated path is CLI/self-host (consistent with PRD FR-05).</p></div>
+
+    <h4>Open questions</h4>
+    <ul>
+      <li><span class="rid">OQ-T1</span> Region: <code>ap-south-1</code> (latency/owner) vs <code>us-east-1</code> (price)? ~10–15% delta.</li>
+      <li><span class="rid">OQ-T2</span> Egress filtering mechanism: security-group + app-level IP checks vs a small egress proxy — which is simplest to operate on one box?</li>
+      <li><span class="rid">OQ-T3</span> Engine licence: clean-build vs forking an OSS scanner — confirm no copyleft entanglement with the commercial control plane (links to PRD OQ-5).</li>
+      <li><span class="rid">OQ-T4</span> Neon free-tier limits (compute hours, storage) vs expected scan volume — validate headroom before launch.</li>
+    </ul>
+
+    <div class="footer">
+      <p>Attestable · TDD v1.0 · QA-passed draft for owner review · companion to PRD v1.0<br>
+      Pricing (AWS us-east-1, mid-2026) and MCP SDK behaviour should be re-verified at build time. Figures provisional; not financial advice.</p>
+    </div>
+  </section>
+
+  </main>
+</div>
+</div>
+
+<script>
+  var prog=document.getElementById('prog');
+  function setProg(){var h=document.documentElement;var s=h.scrollTop/(h.scrollHeight-h.clientHeight);prog.style.width=Math.max(0,Math.min(1,s))*100+'%';}
+  document.addEventListener('scroll',setProg,{passive:true});setProg();
+</script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attestable — Product Requirements Document (v1.0)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14202b;
+    --ink-2:#243441;
+    --paper:#ffffff;
+    --bg:#eceff3;
+    --hair:#d3dce3;
+    --muted:#5c6b78;
+    --accent:#0b6e6b;
+    --accent-bright:#14b8a6;
+    --crit:#b42318;
+    --high:#c4320a;
+    --med:#b54708;
+    --ok:#067647;
+    --chip-ink:#0d2330;
+    --chip-cyan:#7fe7df;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    margin:0;
+    line-height:1.62;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .progress{
+    position:fixed;top:0;left:0;height:3px;width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-bright));
+    z-index:50;transition:width .1s linear;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+  /* ---- Masthead ---- */
+  .masthead{
+    background:var(--ink);
+    color:#eaf2f3;
+    border-bottom:4px solid var(--accent-bright);
+  }
+  .masthead .wrap{padding:38px 24px 30px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--chip-cyan);margin:0 0 14px;
+  }
+  .masthead h1{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:700;font-size:clamp(30px,5vw,52px);
+    line-height:1.04;margin:0 0 10px;letter-spacing:-.01em;
+  }
+  .masthead .tagline{
+    font-size:clamp(16px,2.3vw,20px);color:#b9cace;max-width:60ch;margin:0 0 26px;
+  }
+  .docmeta{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--hair);border:1px solid var(--hair);
+    border-radius:8px;overflow:hidden;margin-top:6px;
+  }
+  .docmeta div{background:var(--ink-2);padding:12px 14px;}
+  .docmeta dt{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:#8aa0a6;margin:0 0 4px;
+  }
+  .docmeta dd{margin:0;font-size:14px;font-weight:500;color:#eaf2f3;}
+  .status-pill{
+    display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    font-weight:600;letter-spacing:.05em;padding:2px 8px;border-radius:4px;
+    background:rgba(20,184,166,.15);color:var(--chip-cyan);border:1px solid rgba(127,231,223,.35);
+  }
+  /* ---- Layout ---- */
+  .layout{display:grid;grid-template-columns:248px 1fr;gap:48px;align-items:start;padding-top:40px;}
+  nav.toc{
+    position:sticky;top:24px;align-self:start;
+    font-size:13.5px;border-left:2px solid var(--hair);padding-left:18px;
+  }
+  nav.toc p{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);margin:0 0 12px;
+  }
+  nav.toc a{
+    display:block;color:var(--ink-2);text-decoration:none;padding:4px 0;
+    border-left:2px solid transparent;margin-left:-20px;padding-left:18px;transition:.15s;
+  }
+  nav.toc a:hover{color:var(--accent);border-left-color:var(--accent-bright);}
+  nav.toc a .n{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:11px;margin-right:7px;}
+  main{min-width:0;background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:8px 44px 56px;}
+  /* ---- Sections ---- */
+  section{padding-top:30px;scroll-margin-top:20px;}
+  section + section{border-top:1px solid var(--hair);margin-top:8px;}
+  .sec-num{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+    letter-spacing:.1em;color:var(--accent);
+  }
+  h2{
+    font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;
+    letter-spacing:-.01em;margin:6px 0 18px;line-height:1.15;color:var(--ink);
+  }
+  h3{
+    font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:18px;
+    margin:28px 0 10px;color:var(--ink-2);
+  }
+  h4{font-size:14px;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px;}
+  p{margin:0 0 14px;}
+  ul,ol{margin:0 0 16px;padding-left:22px;}
+  li{margin-bottom:7px;}
+  strong{font-weight:600;}
+  a.inline{color:var(--accent);}
+  code{
+    font-family:"IBM Plex Mono",monospace;font-size:.88em;
+    background:#eef3f4;padding:1.5px 6px;border-radius:4px;color:var(--ink-2);
+  }
+  .lead{font-size:18px;color:var(--ink-2);}
+  /* chips */
+  .ctrl{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:500;
+    background:var(--chip-ink);color:var(--chip-cyan);padding:2px 7px;border-radius:4px;
+    white-space:nowrap;display:inline-block;margin:1px 0;
+  }
+  .rid{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);
+  }
+  .sev{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;
+    letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;color:#fff;
+  }
+  .sev.crit{background:var(--crit);}
+  .sev.high{background:var(--high);}
+  .sev.med{background:var(--med);}
+  .sev.ok{background:var(--ok);}
+  /* tables */
+  .tbl-scroll{overflow-x:auto;margin:18px 0;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--paper);min-width:560px;}
+  th,td{border:1px solid var(--hair);padding:9px 11px;text-align:left;vertical-align:top;}
+  thead th{
+    background:#f3f6f8;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;
+  }
+  tbody tr:nth-child(even){background:#fafcfc;}
+  /* callouts */
+  .callout{
+    border:1px solid var(--hair);border-left:4px solid var(--accent);
+    background:#f4faf9;padding:14px 18px;border-radius:0 8px 8px 0;margin:18px 0;
+  }
+  .callout.warn{border-left-color:var(--high);background:#fdf6f2;}
+  .callout.qa{border-left-color:var(--accent-bright);background:#f0fdfa;}
+  .callout .label{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;font-weight:600;color:var(--accent);margin:0 0 6px;
+  }
+  .callout.warn .label{color:var(--high);}
+  .callout.qa .label{color:#0d8a82;}
+  .goal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+  .goal-card{border:1px solid var(--hair);border-radius:8px;padding:14px 16px;background:#fcfdfe;}
+  .goal-card .k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;}
+  .kpi{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:22px;color:var(--ink);}
+  .footer{margin-top:46px;padding-top:20px;border-top:1px solid var(--hair);font-size:12.5px;color:var(--muted);}
+  .footer code{background:none;padding:0;color:var(--muted);}
+  /* responsive */
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding:8px 22px 44px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .progress{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Product Requirements Document · Confidential Draft</p>
+    <h1>Attestable</h1>
+    <p class="tagline">Audit-ready security and compliance evidence for the Model Context Protocol — turning what your AI agents are actually allowed to do into proof an auditor will accept.</p>
+    <dl class="docmeta">
+      <div><dt>Version</dt><dd>1.1 (horizontal-first)</dd></div>
+      <div><dt>Status</dt><dd><span class="status-pill">QA-PASSED · FOR REVIEW</span></dd></div>
+      <div><dt>Owner</dt><dd>Jyoti Ranjan Panda</dd></div>
+      <div><dt>Surface</dt><dd>jyotiranjan.dev</dd></div>
+      <div><dt>Doc class</dt><dd>Strategy + Spec</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="layout">
+
+  <nav class="toc">
+    <p>Contents</p>
+    <a href="#s1"><span class="n">01</span>Executive summary</a>
+    <a href="#s2"><span class="n">02</span>Problem &amp; background</a>
+    <a href="#s3"><span class="n">03</span>Goals &amp; non-goals</a>
+    <a href="#s4"><span class="n">04</span>Market &amp; competition</a>
+    <a href="#s5"><span class="n">05</span>Users &amp; personas</a>
+    <a href="#s6"><span class="n">06</span>Use cases</a>
+    <a href="#s7"><span class="n">07</span>Scope &amp; functional reqs</a>
+    <a href="#s8"><span class="n">08</span>The control-mapping model</a>
+    <a href="#s9"><span class="n">09</span>Non-functional reqs</a>
+    <a href="#s10"><span class="n">10</span>Architecture &amp; data</a>
+    <a href="#s11"><span class="n">11</span>Our own posture</a>
+    <a href="#s12"><span class="n">12</span>GTM &amp; pricing</a>
+    <a href="#s13"><span class="n">13</span>Roadmap</a>
+    <a href="#s14"><span class="n">14</span>Risks &amp; mitigations</a>
+    <a href="#s15"><span class="n">15</span>Open questions</a>
+    <a href="#s16"><span class="n">16</span>Appendix &amp; review log</a>
+  </nav>
+
+  <main>
+
+  <section id="s1">
+    <span class="sec-num">SECTION 01</span>
+    <h2>Executive summary</h2>
+    <p class="lead">Regulated companies are wiring AI agents into their core systems through the Model Context Protocol (MCP), and they cannot prove to an auditor that those agents are safe to operate. Attestable closes that gap.</p>
+    <p>MCP has become the default way to connect AI agents to tools, databases, and SaaS. It is spreading fastest exactly where it is most dangerous — healthcare, financial services, insurance — because those sectors have the most valuable data and the strictest audit obligations. The protocol authors deliberately left security to implementers, so every MCP server an enterprise adds is an unvetted path into a regulated system.</p>
+    <p>Two tool categories exist today, and neither solves the regulated buyer's actual problem. MCP <em>security scanners</em> (Snyk Agent Scan, Cisco mcp-scanner) find vulnerabilities but emit engineer-facing findings, not auditor-facing evidence. GRC <em>compliance platforms</em> (Vanta, Drata, Secureframe) emit audit evidence but have no concept of MCP, tool descriptions, or agent permissions. The regulated buyer is forced to bridge the two by hand, in spreadsheets, before every audit.</p>
+    <p><strong>Attestable is the bridge.</strong> It scans live MCP deployments for the known attack classes, then maps each finding and each granted permission to the control it satisfies or violates — and exports the result as an audit-ready evidence pack. The free, open scanner drives adoption; the paid control plane (continuous monitoring, drift detection, control-mapped evidence, immutable audit log) is the business.</p>
+    <p><strong>Sequencing — horizontal first, vertical later.</strong> Phase 1 ships <em>framework-neutral</em>: the scanner plus a generic <em>baseline</em> control-mapping pack that gives any MCP deployment value without committing to a named regulation. The mapping layer is data-driven, so named-framework packs — SOC 2, then HIPAA, then PCI-DSS, then ISO 27001 — are added one per release in Phases 2–3 with no engine changes. Breadth of adoption now; defensible vertical depth as it compounds.</p>
+    <div class="callout">
+      <p class="label">One-line thesis</p>
+      <p style="margin:0;">Scanners tell an engineer a tool is poisoned. Attestable tells a CISO's auditor that the agent touching sensitive data is provably constrained — and produces the paper to prove it. Generically at first; per-framework as the packs ship.</p>
+    </div>
+    <div class="callout qa">
+      <p class="label">v1.1 amendment</p>
+      <p style="margin:0;">This revision changes the go-to-market sequence from "vertical compliance product at launch" to "horizontal engine + baseline pack at launch, vertical packs in Phases 2–3." The architecture is built to support domains from day one; no single domain is required to ship. Sections 03, 07, 08 and 13 carry the change.</p>
+    </div>
+  </section>
+
+  <section id="s2">
+    <span class="sec-num">SECTION 02</span>
+    <h2>Problem &amp; background</h2>
+    <h3>Why MCP creates a new, unaddressed compliance surface</h3>
+    <p>MCP is now the de-facto integration standard for agentic AI, with protocol SDKs at roughly 97M downloads per month and adoption across the major model providers. The official specification explicitly states it cannot enforce security at the protocol level — that responsibility shifts entirely to whoever deploys the server.</p>
+    <p>The resulting exposure is measured, not hypothetical. Independent scans of public MCP servers have found tool-poisoning payloads present in roughly 5% of servers, and individual MCP-related CVEs have reached the maximum CVSS 10.0 severity. The marquee attack classes are specific to MCP:</p>
+    <ul>
+      <li><strong>Tool poisoning</strong> — malicious instructions hidden in a tool's <em>description</em>, which the agent reads as ground truth and obeys.</li>
+      <li><strong>Rug-pulls</strong> — a server changes a tool's behaviour silently <em>after</em> it has been approved and installed.</li>
+      <li><strong>Cross-origin / tool shadowing</strong> — one server's tool overrides or impersonates another's.</li>
+      <li><strong>Over-privileged tools &amp; weak schemas</strong> — tools exposing shell, file mutation, or raw query access with no input bounds.</li>
+    </ul>
+    <h3>Why this is a compliance problem, not only a security problem</h3>
+    <p>In regulated sectors the obligation is not just to be secure but to <em>demonstrate</em> it. Procurement in healthcare, finance, and insurance now demands SOC 2 Type II, HIPAA BAAs, and PCI-DSS attestations on the day a contract is signed — and regulators expect immutable records of every agent action, retained for up to seven years in financial services. When an AI agent reads a record through MCP, it inherits every one of those obligations.</p>
+    <div class="callout warn">
+      <p class="label">The gap, precisely</p>
+      <p style="margin:0;">A security scanner output ("tool X contains a suspicious description") is not an audit artifact. No framework has a control that says "run a scanner." Auditors ask: <em>which control does this satisfy, what is the evidence, and how do you know it is still true today?</em> Nothing on the market answers that for MCP.</p>
+    </div>
+  </section>
+
+  <section id="s3">
+    <span class="sec-num">SECTION 03</span>
+    <h2>Goals &amp; non-goals</h2>
+    <h3>Goals</h3>
+    <div class="goal-grid">
+      <div class="goal-card"><p class="k">G1 · Wedge</p>Become the default free tool a regulated developer runs before approving an MCP server.</div>
+      <div class="goal-card"><p class="k">G2 · Bridge</p>Convert raw MCP findings into control-mapped, audit-ready evidence via a data-driven mapping layer — a generic baseline pack first, named-framework packs added without engine changes.</div>
+      <div class="goal-card"><p class="k">G3 · Continuity</p>Prove a deployment is <em>still</em> compliant over time via drift &amp; rug-pull detection.</div>
+      <div class="goal-card"><p class="k">G4 · Trust</p>Keep regulated data inside the customer boundary by default; earn the buyer's trust posture.</div>
+      <div class="goal-card"><p class="k">G5 · Moat</p>Accumulate an MCP server reputation &amp; control-evidence graph that compounds with usage.</div>
+      <div class="goal-card"><p class="k">G6 · Extensible</p>Make the mapping layer pluggable so each new regulated domain ships as a self-contained pack — vertical depth without re-architecture.</div>
+    </div>
+    <h3>Non-goals (Phase 1)</h3>
+    <ul>
+      <li>Not a general-purpose GRC platform. Attestable produces MCP/agent evidence that <em>feeds</em> Vanta/Drata; it does not replace them in year one.</li>
+      <li><strong>Not domain-specific at launch.</strong> Phase 1 is framework-neutral — a buyer gets value from the scanner and the baseline pack without adopting any named regulation. Vertical depth (SOC 2 → HIPAA → PCI-DSS → ISO) arrives as packs in Phases 2–3, not in v1.</li>
+      <li>Not racing Snyk on IDE/client breadth. The wedge is the bridge (findings → control evidence) and, later, vertical depth — not feature parity on scanning surface.</li>
+      <li>Not a runtime model firewall or guardrail engine for prompt content. Scope is the MCP tool/permission surface, not message-level moderation.</li>
+      <li>Does not "certify" compliance. It produces evidence; the auditor and the customer's controls determine certification.</li>
+    </ul>
+  </section>
+
+  <section id="s4">
+    <span class="sec-num">SECTION 04</span>
+    <h2>Market &amp; competitive analysis</h2>
+    <p>The landscape splits into two camps that do not overlap — which is the whole opportunity.</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Player</th><th>Category</th><th>MCP-aware?</th><th>Control-mapped evidence?</th><th>Position vs. Attestable</th></tr></thead>
+      <tbody>
+        <tr><td>Snyk Agent Scan (ex-MCP-Scan, Invariant Labs)</td><td>MCP scanner / proxy</td><td>Yes — deep</td><td>No</td><td>Incumbent on detection; engineer-facing. Primary substitution risk (see §14).</td></tr>
+        <tr><td>Cisco mcp-scanner</td><td>OSS YARA scanner</td><td>Yes</td><td>No</td><td>Pattern detection only; no evidence layer.</td></tr>
+        <tr><td>MCPScan.ai</td><td>Hosted MCP governance</td><td>Yes</td><td>Partial / unverified</td><td>Closest adjacent; depth of framework control-mapping unconfirmed (validation item).</td></tr>
+        <tr><td>Lasso Security</td><td>Runtime AI security</td><td>Yes</td><td>No</td><td>Runtime injection blocking; not audit evidence.</td></tr>
+        <tr><td>Vanta / Drata / Secureframe</td><td>GRC automation</td><td>No</td><td>Yes — generic</td><td>Own the evidence relationship but have zero MCP/agent comprehension.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout">
+      <p class="label">The seam</p>
+      <p style="margin:0;">Scanners produce findings without control context. GRC platforms produce control context without MCP comprehension. Attestable is the only product positioned to produce <em>MCP findings already mapped to named compliance controls</em>. That intersection is currently empty.</p>
+    </div>
+    <h3>Market economics (reference)</h3>
+    <p>GRC compliance tooling is an established spend: mid-market platform licences run roughly $7K–$30K/year, with all-in first-time SOC 2 Type II programs at $30K–$120K. Building compliant AI infrastructure in-house is commonly $35K–$150K+ in the first year. Attestable does not need to create budget — it attaches to an existing, mandatory line item that AI adoption is now inflating.</p>
+  </section>
+
+  <section id="s5">
+    <span class="sec-num">SECTION 05</span>
+    <h2>Target users &amp; personas</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Persona</th><th>Role context</th><th>Core job-to-be-done</th><th>Tier</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Priya — AI Platform Lead</strong></td><td>Owns agent infra at a regulated mid-market company</td><td>Approve/deny new MCP servers fast, without becoming the audit bottleneck</td><td>Free → Team</td></tr>
+        <tr><td><strong>Marcus — Compliance / GRC Lead</strong></td><td>Runs the SOC 2 / HIPAA program</td><td>Get audit-ready evidence that the AI agents meet the same controls as everything else</td><td>Compliance</td></tr>
+        <tr><td><strong>Dana — Security Engineer</strong></td><td>AppSec / agent security</td><td>Catch poisoning &amp; over-privilege pre-deploy and on drift; feed SIEM</td><td>Team → Compliance</td></tr>
+        <tr><td><strong>Sam — Solo / startup builder</strong></td><td>Ships agents into regulated buyers</td><td>Pass a customer's security review on the day they ask</td><td>Free → Team</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Primary economic buyer is <strong>Marcus</strong> (compliance owns the budget line). Primary adoption driver is <strong>Priya / Dana / Sam</strong> (they run the free scanner first). The product must serve both: technical credibility wins the user, evidence output wins the buyer.</p>
+  </section>
+
+  <section id="s6">
+    <span class="sec-num">SECTION 06</span>
+    <h2>Use cases &amp; user stories</h2>
+    <ul>
+      <li><span class="rid">UC-1</span> &nbsp;<em>As Priya,</em> I paste a public MCP server URL into jyotiranjan.dev and get a severity-scored report in under a minute, so I can decide whether to approve it.</li>
+      <li><span class="rid">UC-2</span> &nbsp;<em>As Dana,</em> I run the local CLI against an internal MCP server inside our VPC so its manifest never leaves our network, and I wire it into CI to block merges on critical findings.</li>
+      <li><span class="rid">UC-3</span> &nbsp;<em>As Marcus,</em> I export an evidence pack that maps each agent's tool permissions to <span class="ctrl">HIPAA §164.312(b)</span> <span class="ctrl">PCI-DSS Req 10</span> <span class="ctrl">SOC 2 CC7.2</span> for our Type II audit.</li>
+      <li><span class="rid">UC-4</span> &nbsp;<em>As Dana,</em> I get alerted when an approved server's tool definitions change (rug-pull) so a re-review is triggered automatically.</li>
+      <li><span class="rid">UC-5</span> &nbsp;<em>As Sam,</em> I generate a shareable, scoped report to hand to a prospect's security reviewer to clear procurement.</li>
+      <li><span class="rid">UC-6</span> &nbsp;<em>As Marcus,</em> I show an auditor an immutable, timestamped log proving the control held continuously across the audit period, not just on test day.</li>
+    </ul>
+  </section>
+
+  <section id="s7">
+    <span class="sec-num">SECTION 07</span>
+    <h2>Product scope &amp; functional requirements</h2>
+    <p>Requirements are tagged with a priority: <span class="sev crit">P0</span> launch-critical, <span class="sev high">P1</span> fast-follow, <span class="sev med">P2</span> later.</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>ID</th><th>Requirement</th><th>Detail</th><th>Pri</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rid">FR-01</span></td><td>Live MCP connection &amp; enumeration</td><td>Connect over stdio and streamable-HTTP transports; complete handshake; enumerate tools, resources, and prompts (not tools alone).</td><td><span class="sev crit">P0</span></td></tr>
+        <tr><td><span class="rid">FR-02</span></td><td>Tool-poisoning &amp; injection detection</td><td>Deterministic + rule/YARA-style scan of tool descriptions and schemas for hidden directives, exfil patterns, invisible unicode.</td><td><span class="sev crit">P0</span></td></tr>
+        <tr><td><span class="rid">FR-03</span></td><td>Over-privilege &amp; schema-weakness detection</td><td>Flag hazardous primitives (shell, file write, raw SQL, egress) and tools with missing/unbounded input validation.</td><td><span class="sev crit">P0</span></td></tr>
+        <tr><td><span class="rid">FR-04</span></td><td>Severity scoring &amp; human report</td><td>Normalized score per finding; shareable HTML/JSON report with remediation guidance.</td><td><span class="sev crit">P0</span></td></tr>
+        <tr><td><span class="rid">FR-05</span></td><td>Local CLI / no-egress mode</td><td>Full scan runs locally; private-server manifests never transmitted off-host. Hosted portal restricted to public endpoints.</td><td><span class="sev crit">P0</span></td></tr>
+        <tr><td><span class="rid">FR-06</span></td><td>Control-mapping engine (data-driven)</td><td>Maps findings &amp; granted permissions to controls by loading versioned <strong>mapping packs</strong> — not hardcoded per framework. Engine is framework-neutral; packs supply the controls. (See §08.)</td><td><span class="sev high">P1</span></td></tr>
+        <tr><td><span class="rid">FR-06a</span></td><td>Baseline pack + pack format</td><td>Ship one generic <strong>baseline</strong> pack (sensible default controls, no named regulation) and a documented pack schema so SOC 2 / HIPAA / PCI-DSS / ISO packs drop in later with zero engine change.</td><td><span class="sev high">P1</span></td></tr>
+        <tr><td><span class="rid">FR-07</span></td><td>Evidence-pack export</td><td>Generate timestamped, framework-organized evidence bundles suitable for auditor hand-off and GRC import.</td><td><span class="sev high">P1</span></td></tr>
+        <tr><td><span class="rid">FR-08</span></td><td>Rug-pull / drift detection</td><td>Hash tool manifests; re-scan on schedule; diff and alert on change; trigger re-review workflow.</td><td><span class="sev high">P1</span></td></tr>
+        <tr><td><span class="rid">FR-09</span></td><td>Semantic detection layer (opt-in)</td><td>Optional LLM/semantic analysis for subtle poisoning; explicit opt-in; local-model option for regulated/no-egress customers.</td><td><span class="sev high">P1</span></td></tr>
+        <tr><td><span class="rid">FR-10</span></td><td>Policy-enforcement proxy</td><td>Self-hosted proxy: validate tool-call arguments against schema; pin per-agent permissions; deny on violation.</td><td><span class="sev med">P2</span></td></tr>
+        <tr><td><span class="rid">FR-11</span></td><td>Immutable audit log</td><td>Append-only, tamper-evident log of scans, findings, and control states; 7-year retention option; SIEM/OpenTelemetry export.</td><td><span class="sev high">P1</span></td></tr>
+        <tr><td><span class="rid">FR-12</span></td><td>Server reputation / known-bad registry</td><td>Aggregate anonymized scan results into a queryable reputation index of MCP servers. (Moat — see §14.)</td><td><span class="sev med">P2</span></td></tr>
+        <tr><td><span class="rid">FR-13</span></td><td>CI integration</td><td>GitHub Action / CLI exit codes to fail builds on threshold breach.</td><td><span class="sev high">P1</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s8">
+    <span class="sec-num">SECTION 08</span>
+    <h2>The control-mapping model <span style="font-size:13px;color:var(--muted);font-family:'IBM Plex Mono';">— pluggable packs</span></h2>
+    <p>Generic control-mapping exists in GRC platforms, so the defensible idea is not "we map to controls" — it is <em>where</em> the mapping sits and <em>how</em> it extends. Two layers, kept strictly separate:</p>
+    <ul>
+      <li><strong>Detection layer (framework-neutral).</strong> The engine produces facts about an MCP server — this tool exposes shell access, this description is poisoned, no immutable record exists. These facts mention no regulation.</li>
+      <li><strong>Mapping layer (data-driven packs).</strong> A versioned <em>pack</em> turns a fact into "satisfies / violates control X." Phase 1 ships a generic <strong>baseline</strong> pack; named-framework packs are added later as data, not code.</li>
+    </ul>
+    <p>Because the boundary is hard, adding a regulated domain is dropping in a new pack — no change to the detection engine. That is what makes "horizontal now, vertical later" an architecture rather than a rewrite. Illustrative output of named-framework packs (Phases 2–3), built on the same neutral facts:</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>MCP fact / finding (neutral)</th><th>Risk</th><th>Pack maps it to</th><th>Evidence produced</th></tr></thead>
+      <tbody>
+        <tr><td>Tool exposes raw DB query over a sensitive source</td><td><span class="sev crit">Critical</span></td><td><span class="ctrl">HIPAA §164.312(a)(1)</span> <span class="ctrl">SOC 2 CC6.1</span></td><td>Access-control scope record + denial proof</td></tr>
+        <tr><td>Tool description contains hidden directive</td><td><span class="sev crit">Critical</span></td><td><span class="ctrl">SOC 2 CC7.2</span> <span class="ctrl">ISO A.8.16</span></td><td>Poisoning-scan attestation, pre-deploy</td></tr>
+        <tr><td>No immutable record of tool calls</td><td><span class="sev high">High</span></td><td><span class="ctrl">PCI-DSS Req 10</span> <span class="ctrl">HIPAA §164.312(b)</span></td><td>Audit-log configuration evidence</td></tr>
+        <tr><td>Tool definitions changed post-approval</td><td><span class="sev high">High</span></td><td><span class="ctrl">SOC 2 CC8.1</span></td><td>Change-management diff + re-review trail</td></tr>
+        <tr><td>Card data reachable by un-scoped tool</td><td><span class="sev crit">Critical</span></td><td><span class="ctrl">PCI-DSS Req 7</span></td><td>Scope-segmentation report</td></tr>
+        <tr><td>Schema validates &amp; permission pinned</td><td><span class="sev ok">Pass</span></td><td><span class="ctrl">baseline · least-privilege</span></td><td>Passing control evidence (positive)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>In Phase 1 the same neutral facts run through the <strong>baseline</strong> pack, producing generic control evidence (least-privilege, change-control, audit-logging, injection-resistance) that any MCP deployment can use. Packs are versioned and centrally maintained: as the MCP spec or a regulation evolves, the pack updates and every customer's evidence references the pack version it was generated against. <em>Both</em> failing and passing controls produce evidence — auditors need proof of what works, not only a list of what is broken.</p>
+  </section>
+
+  <section id="s9">
+    <span class="sec-num">SECTION 09</span>
+    <h2>Non-functional requirements</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>ID</th><th>Attribute</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rid">NFR-01</span></td><td>Scan latency</td><td>Deterministic scan of a typical server (&lt;30 tools) returns in &lt; 5s; portal report &lt; 60s end-to-end.</td></tr>
+        <tr><td><span class="rid">NFR-02</span></td><td>Data residency</td><td>Private-server scans never egress host/VPC (FR-05). Hosted service = public servers only.</td></tr>
+        <tr><td><span class="rid">NFR-03</span></td><td>Determinism</td><td>Core checks are reproducible and explainable; no mandatory model dependency in the free tier.</td></tr>
+        <tr><td><span class="rid">NFR-04</span></td><td>Auditability of Attestable itself</td><td>Tamper-evident logs; reproducible evidence packs; signed report artifacts.</td></tr>
+        <tr><td><span class="rid">NFR-05</span></td><td>Deployment</td><td>Single-binary CLI; Docker image; optional VPC/on-prem for Compliance tier.</td></tr>
+        <tr><td><span class="rid">NFR-06</span></td><td>False-positive discipline</td><td>Findings carry confidence + rationale; "intended behaviour" suppression to keep signal high.</td></tr>
+        <tr><td><span class="rid">NFR-07</span></td><td>Accessibility &amp; portability</td><td>Reports readable offline; keyboard-navigable; no proprietary viewer required.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s10">
+    <span class="sec-num">SECTION 10</span>
+    <h2>System architecture &amp; data model</h2>
+    <h3>Component stack</h3>
+    <ol>
+      <li><strong>Scanner engine</strong> (Python, official MCP SDK as client) — connection, enumeration, deterministic + rule checks. Shipped as CLI/Docker and as the hosted portal backend.</li>
+      <li><strong>Control-mapping service</strong> — applies the maintained mapping library to engine findings; produces control states.</li>
+      <li><strong>Evidence store</strong> — append-only, tamper-evident; holds findings, control states, manifest hashes, timestamps. JSON from day one (the data is the moat even before a DB wraps it).</li>
+      <li><strong>Control plane (SaaS)</strong> — scheduling, drift detection, dashboards, evidence export, reputation index, SIEM/OTel egress.</li>
+      <li><strong>Enforcement proxy</strong> (P2) — optional runtime data-plane sitting beside customer MCP servers.</li>
+    </ol>
+    <div class="callout">
+      <p class="label">Open-core boundary</p>
+      <p style="margin:0;">Engine + CLI + enforcement proxy are <strong>open source</strong> (drives trust and adoption, resists "just a wrapper" criticism). Control-mapping library, evidence store, drift, reputation index, and audit log are the <strong>commercial control plane</strong>. Value and lock-in sit in the control plane and the data — not the forkable proxy.</p>
+    </div>
+    <h3>Core entities</h3>
+    <ul>
+      <li><code>Server</code> — endpoint, transport, owner, trust state, manifest-hash history.</li>
+      <li><code>Tool</code> / <code>Resource</code> / <code>Prompt</code> — description, schema, privilege flags, version hash.</li>
+      <li><code>Finding</code> — type, severity, confidence, rationale, linked entity.</li>
+      <li><code>ControlState</code> — framework, control id, status (pass/fail/NA), evidence ref, asserted-at.</li>
+      <li><code>EvidencePack</code> — framework, scope, generated-at, signature, included control states.</li>
+      <li><code>ScanRun</code> — trigger, actor, duration, diff vs. previous run.</li>
+    </ul>
+  </section>
+
+  <section id="s11">
+    <span class="sec-num">SECTION 11</span>
+    <h2>Attestable's own compliance posture</h2>
+    <p>A product that sells compliance evidence is held to a higher bar than its customers. Non-negotiables:</p>
+    <ul>
+      <li><strong>Default to no-egress</strong> for regulated data; PII/secret redaction occurs before any data could leave the customer boundary, never at a downstream model provider.</li>
+      <li><strong>Own SOC 2 Type II + HIPAA readiness</strong> on the roadmap before Compliance-tier GA; BAA available; report artifacts signed.</li>
+      <li><strong>Immutable, exportable audit log</strong> with up-to-7-year retention to match financial-services expectations.</li>
+      <li><strong>Honest claims</strong> — marketing says "audit-ready evidence" and "maps to controls," never "guarantees compliance." Overclaiming is an existential legal risk for this category.</li>
+    </ul>
+  </section>
+
+  <section id="s12">
+    <span class="sec-num">SECTION 12</span>
+    <h2>Go-to-market &amp; pricing</h2>
+    <h3>Motion: open wedge → evidence upsell</h3>
+    <p>Free scanner is the top of funnel and the portfolio centerpiece on jyotiranjan.dev. Adoption is developer-led (Priya/Dana/Sam); monetization is compliance-led (Marcus). Content engine: publish recurring "state of MCP security in regulated sectors" findings from anonymized scan data — this simultaneously markets the tool and builds the reputation index (FR-12).</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Tier</th><th>Who</th><th>Includes</th><th>Indicative price</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Free / OSS</strong></td><td>Devs, solo, evaluators</td><td>CLI + hosted public scan, deterministic detection, severity report, CI action</td><td>$0</td></tr>
+        <tr><td><strong>Team</strong></td><td>Security/platform teams</td><td>Continuous monitoring, drift/rug-pull, semantic layer, 1 framework mapping, shareable reports</td><td>~$200–600 / mo</td></tr>
+        <tr><td><strong>Compliance</strong></td><td>Regulated enterprises</td><td>Multi-framework mapping, evidence packs, immutable 7-yr log, VPC/on-prem, BAA, SIEM export, enforcement proxy</td><td>~$12K–30K / yr</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Compliance pricing is deliberately benchmarked to the existing GRC platform band, where it attaches as an AI-specific extension rather than competing on price.</p>
+  </section>
+
+  <section id="s13">
+    <span class="sec-num">SECTION 13</span>
+    <h2>Roadmap &amp; milestones</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Phase</th><th>Window</th><th>Ships</th><th>Exit criterion</th></tr></thead>
+      <tbody>
+        <tr><td><strong>P0 · Wedge</strong></td><td>Wks 1–4</td><td>FR-01..05, FR-13 — engine, CLI, public portal, CI (framework-neutral scanner)</td><td>Scans real public servers; surfaces ≥1 critical on a known-vulnerable set</td></tr>
+        <tr><td><strong>P1 · Mapping engine + baseline</strong></td><td>Wks 5–10</td><td>FR-06, FR-06a, 07, 08, 11 — data-driven mapping engine, <strong>baseline pack</strong>, evidence export, drift, audit log</td><td>Architecture proven with one pack: a baseline evidence pack a design partner finds useful</td></tr>
+        <tr><td><strong>P2 · First vertical pack + control plane</strong></td><td>Wks 11–18</td><td>First named-framework pack (SOC 2) + FR-10,12, Compliance tier, VPC, reputation index</td><td>First paying customer; SOC 2 pack output accepted by a design-partner auditor</td></tr>
+        <tr><td><strong>P3 · Vertical depth (packs, one per release)</strong></td><td>Ongoing</td><td>HIPAA → PCI-DSS → ISO packs, each a contained release; own SOC 2 Type II, BAA</td><td>Each new domain ships as a pack with no engine change; enterprise procurement passes on day of ask</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s14">
+    <span class="sec-num">SECTION 14</span>
+    <h2>Risks &amp; mitigations</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Snyk (or a GRC vendor) adds control-mapping and absorbs the wedge</strong></td><td><span class="sev crit">Critical</span></td><td>Compete on vertical depth (regulated control libraries auditors trust), audit-partner relationships, and the compounding evidence/reputation graph — assets a horizontal incumbent won't prioritize quickly. Accept that this is a race; speed to design partners is the hedge.</td></tr>
+        <tr><td>MCP Registry (Linux Foundation) ships official server signing/attestation</td><td><span class="sev high">High</span></td><td>Signing proves provenance, not control-compliance. Attestable consumes attestation as an input and still maps to frameworks — complementary, not displaced.</td></tr>
+        <tr><td>Hosted scanner can't reach private servers (where regulated value is)</td><td><span class="sev high">High</span></td><td>Local CLI/no-egress mode is the regulated path by design (FR-05); hosted portal is funnel, not the product.</td></tr>
+        <tr><td>Over-claiming compliance → legal exposure</td><td><span class="sev high">High</span></td><td>Evidence-not-certification language enforced everywhere (§11).</td></tr>
+        <tr><td>False positives erode trust</td><td><span class="sev med">Medium</span></td><td>Confidence scores, rationale, intended-behaviour suppression (NFR-06).</td></tr>
+        <tr><td>MCPScan.ai already covers this slice</td><td><span class="sev med">Medium</span></td><td>Open validation item — confirm their framework-mapping depth before P1 build (§15).</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s15">
+    <span class="sec-num">SECTION 15</span>
+    <h2>Open questions</h2>
+    <ul>
+      <li><span class="rid">OQ-1</span> Does MCPScan.ai (or Snyk) already map findings to named framework controls? Confirm before committing P1.</li>
+      <li><span class="rid">OQ-2</span> Which single framework leads — HIPAA (healthcare) or PCI-DSS (collections/finance)? Owner's domain access may decide the first design partner.</li>
+      <li><span class="rid">OQ-3</span> Is the reputation index (FR-12) ethically/legally clean if built from scanning third-party public servers? Needs review.</li>
+      <li><span class="rid">OQ-4</span> Final product name — "Attestable" is provisional; check trademark/domain.</li>
+      <li><span class="rid">OQ-5</span> Build vs. extend: fork/contribute to an OSS scanner for the engine, or build clean to avoid licence entanglement with the commercial layer?</li>
+    </ul>
+  </section>
+
+  <section id="s16">
+    <span class="sec-num">SECTION 16</span>
+    <h2>Appendix &amp; review log</h2>
+    <h4>Contributors (roles)</h4>
+    <p>Market/Security SME · Architecture SME · Product SME · QA reviewer — orchestrated across rounds; all market and competitive facts grounded in live research (Jun 2026).</p>
+    <h4>QA review log — issues caught &amp; resolved before v1.0</h4>
+    <div class="callout qa">
+      <p class="label">QA-01 · resolved</p>
+      <p style="margin:0;">Hosted live-scan contradicted the no-egress promise. → Split deployment (FR-05): public-only portal, local CLI for private servers.</p>
+    </div>
+    <div class="callout qa">
+      <p class="label">QA-02 · resolved</p>
+      <p style="margin:0;">"Makes you HIPAA compliant" overclaim. → Reworded to "audit-ready evidence mapped to controls" throughout (§11).</p>
+    </div>
+    <div class="callout qa">
+      <p class="label">QA-03 · resolved</p>
+      <p style="margin:0;">Deterministic-only would under-detect poisoning; LLM-only adds egress. → Tiered detection (FR-02 deterministic free; FR-09 opt-in semantic, local-model option).</p>
+    </div>
+    <div class="callout qa">
+      <p class="label">QA-04 · resolved</p>
+      <p style="margin:0;">"Snyk could add this" hand-waved. → Concretized to vertical depth + audit relationships + evidence graph; flagged as a genuine race (§14).</p>
+    </div>
+    <div class="callout qa">
+      <p class="label">QA-05 · resolved</p>
+      <p style="margin:0;">Unverifiable claim about MCPScan.ai feature depth. → Demoted to open validation item (OQ-1) rather than asserted.</p>
+    </div>
+    <h4>Glossary</h4>
+    <p><strong>MCP</strong> — Model Context Protocol, the standard connecting AI agents to external tools/data. <strong>Tool poisoning</strong> — malicious instructions hidden in a tool description. <strong>Rug-pull</strong> — silent post-approval change to a tool. <strong>Evidence pack</strong> — framework-organized, timestamped audit artifact. <strong>Control mapping</strong> — translation of a technical finding into a named compliance control.</p>
+    <h4>Source basis</h4>
+    <p>Competitive, threat-prevalence, and pricing figures derive from public 2026 sources on MCP security tooling and GRC compliance economics, captured during research for this document. Specific figures should be re-verified at build time as the space moves monthly.</p>
+
+    <div class="footer">
+      <p>Attestable · PRD v1.0 · QA-passed draft for owner review · target surface <code>jyotiranjan.dev</code><br>
+      Working name and all figures provisional. Not legal advice; compliance determinations rest with the customer's auditor.</p>
+    </div>
+  </section>
+
+  </main>
+</div>
+</div>
+
+<script>
+  // restrained signature: reading-progress rail (functional in a long doc)
+  var prog = document.getElementById('prog');
+  function setProg(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop)/(h.scrollHeight - h.clientHeight);
+    prog.style.width = Math.max(0,Math.min(1,scrolled))*100 + '%';
+  }
+  document.addEventListener('scroll', setProg, {passive:true});
+  setProg();
+</script>
+</body>
+</html>

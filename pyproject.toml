@@ -1,0 +1,43 @@
+[project]
+name = "attestable"
+version = "0.1.0"
+description = "Attestable — MCP security + compliance-evidence platform (workspace root)."
+requires-python = ">=3.11"
+dependencies = [
+    "attestable-engine",
+    "attestable-cli",
+    "attestable-control-plane",
+]
+
+# Virtual workspace root: aggregates the members below but is not itself built.
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+attestable-engine = { workspace = true }
+attestable-cli = { workspace = true }
+attestable-control-plane = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["packages"]
+markers = [
+    "slow: integration tests — run in CI on push, skipped by the pre-commit hook",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
