@@ -7,7 +7,7 @@
 - **Branch:** `chore/agent-context-setup`
 - **Spec source:** docs/detection-rules-spec.md §3.3 (O0–O3); derived from TDD §07,
   PRD FR-03, Blueprint §09; finding_type `tool.over_privilege` from TDD §08.
-- **Started:** 2026-06-28 · **Done:** —
+- **Started:** 2026-06-28 · **Done:** 2026-06-28 (`f1975c1`)
 
 ## Loop progress (blueprint §06)
 
@@ -18,7 +18,7 @@
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. Every finding fixed test-first; all three re-reviewed **clean**
       (code no-blocking, security LOW cleared, qa PASS); spec-scope items → OQs
-- [ ] 7. Human read the diff → commit  ← **awaiting owner**
+- [x] 7. Human read the diff → committed (`f1975c1`)
 
 ## 1. Architect design
 
@@ -161,4 +161,5 @@ security's lowercase-literal-SQL note both folded into §3.3 / the OQs.)
 
 ## Commit
 
-_Pending owner review of the diff (loop step 7)._
+`f1975c1` — feat(engine): F3 over-privilege & schema — capability + missing/
+unbounded schema detection. Owner approved the diff; 6 files, 161 tests green.
