@@ -7,15 +7,22 @@
 
 ## Now
 
-- **Active feature:** _none_ — scaffold + agent panel + references/journal set up.
-- **Loop step:** — (see the 7 steps in `README.md`)
-- **Branch:** _n/a_
-- **Last red:** — · **Last green:** —
-- **Open findings:** none
-- **Next action:** Start **F1 (Connect + enumerate)** via `/feature F1` → architect
-  produces the ordered test list before any code.
+- **Active feature:** **F1 — Connect & enumerate** (engine) — **loop complete,
+  awaiting owner diff-read before commit.** Log: `F1-connect-enumerate.md`.
+- **Loop step:** 7 — human reads the diff → commit.
+- **Branch:** `chore/agent-context-setup` (F1 work continues here for now).
+- **Last red:** dup-name + malformed-input tests (pre-fix) · **Last green:** 41 passed, ruff + mypy strict clean.
+- **Open findings:** none blocking. One **owner OQ**: payload size caps (deferred
+  to F7/adapter, needs threshold policy — spec §3.1 R6).
+- **Next action:** Owner reads the F1 diff → I commit F1. Then start **F2
+  (poisoning detection)** — the headline demo — via the same loop.
+- **Design seam:** engine core is built against a `Session` Protocol (initialize /
+  list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
+  no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
+- **Spec gate cleared:** `detection-rules-spec.md` §1/§2/§3.1 filled from the TDD
+  (was a stub). Eyeball before trusting the tests.
 
-_Last updated: 2026-06-28 — initial setup._
+_Last updated: 2026-06-28 — F1 started._
 
 ## Phase-1 feature backlog (blueprint §09)
 
