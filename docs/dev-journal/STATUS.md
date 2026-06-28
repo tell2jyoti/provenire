@@ -7,22 +7,24 @@
 
 ## Now
 
-- **Active feature:** **F1 — Connect & enumerate** (engine) — **loop complete,
-  awaiting owner diff-read before commit.** Log: `F1-connect-enumerate.md`.
-- **Loop step:** 7 — human reads the diff → commit.
-- **Branch:** `chore/agent-context-setup` (F1 work continues here for now).
-- **Last red:** dup-name + malformed-input tests (pre-fix) · **Last green:** 41 passed, ruff + mypy strict clean.
-- **Open findings:** none blocking. One **owner OQ**: payload size caps (deferred
-  to F7/adapter, needs threshold policy — spec §3.1 R6).
-- **Next action:** Owner reads the F1 diff → I commit F1. Then start **F2
-  (poisoning detection)** — the headline demo — via the same loop.
+- **Active feature:** **F2 — Poisoning detection** (engine). Log: `F2-poisoning-detection.md`.
+- **Loop step:** 7 — **all reviews clean; awaiting owner to read the diff + commit.**
+- **Branch:** `chore/agent-context-setup`.
+- **Last red:** F2 ReDoS test (4.34s) + P3 scheme-only rationale — both now green.
+  · **Last green:** F2, **97 passed**, ruff + mypy strict clean.
+- **Open findings:** none blocking. **Owner OQs** (spec follow-ups, see F2 log
+  §Decisions): (1) duplicate-named-primitive dedup wording; (2) NFKC/homoglyph
+  evasion; (3) invisible-but-not-Cc/Cf chars; (4) payload size cap (F7/R6).
+- **Next action:** **Owner: read the F2 diff and commit** (loop step 7 — autonomy
+  pauses here). Then start **F3 (over-privilege + schema)** via `/feature F3`;
+  needs spec §3.3 filled first (currently a stub).
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
 - **Spec gate cleared:** `detection-rules-spec.md` §1/§2/§3.1 filled from the TDD
   (was a stub). Eyeball before trusting the tests.
 
-_Last updated: 2026-06-28 — F1 started._
+_Last updated: 2026-06-28 — F2 through loop step 6 (all reviews clean); awaiting owner commit._
 
 ## Phase-1 feature backlog (blueprint §09)
 
@@ -32,8 +34,8 @@ started.
 
 | # | Feature | First tests (red) | Layer | State |
 | --- | --- | --- | --- | --- |
-| F1 | Connect + enumerate | Handshake, list tools/resources/prompts, timeout, manifest hash | engine | ☐ not started |
-| F2 | Poisoning detection | Hidden-directive, invisible-unicode, exfil patterns vs fixtures | engine | ☐ not started |
+| F1 | Connect + enumerate | Handshake, list tools/resources/prompts, timeout, manifest hash | engine | ☑ done (`9ba2996`, 41 tests) |
+| F2 | Poisoning detection | Hidden-directive, invisible-unicode, exfil patterns vs fixtures | engine | ◧ reviews clean, awaiting owner commit (97 tests) |
 | F3 | Over-privilege + schema | Shell/file/SQL flags, missing/unbounded schema | engine | ☐ not started |
 | F4 | Scoring | Severity normalization, confidence, suppression | engine | ☐ not started |
 | F5 | Report | JSON + HTML artifact shape, deterministic output | engine | ☐ not started |

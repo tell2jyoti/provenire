@@ -111,7 +111,69 @@ Acceptance (F1): given a `Session` exposing a known set of primitives, the engin
 returns a `Manifest` satisfying R4–R6, raising `TargetUnreachable` on R2, with a
 hash meeting R5a–R5c. No `Finding`s are produced.
 
-### 3.2 Poisoning detection  (feature F2 — _to be filled when F2 starts_)
+### 3.2 Poisoning detection  (feature F2, layer: engine)
+
+Deterministic detection (no LLM) over the normalized `Manifest`'s text fields.
+Tool descriptions are agent-facing instructions the model reads but the user
+rarely sees, so they are a prime injection vector (MCP "tool poisoning";
+`docs/references/mcp-security-best-practices.md`). The detector emits `Finding`s
+(§2.2); it never names a regulation.
+
+**Scanned surface.** For every primitive, the concatenated text of its
+human/agent-facing fields — tools & prompts: `name` + `description`; resources:
+`name` + `description`. `entity_ref` is `tool:<name>` / `prompt:<name>` /
+`resource:<uri>`. All three kinds are scanned (consistent with R4).
+
+**Determinism.** The same `Manifest` yields the same findings in a canonical
+order: sorted by `(entity_ref, finding_type, first-match offset)`. At most one
+finding per `(entity_ref, finding_type)` (the first/strongest match; rationale
+names it).
+
+**Provisional scoring.** Each rule below fixes a `severity` and `confidence`;
+these are inputs to §4 (F4) which may normalize/suppress later. They are not
+final assertions.
+
+- **P1 — Invisible / non-printable Unicode → `tool.invisible_unicode`.**
+  Flag any scanned text containing a character in these classes (used to hide
+  instructions from a human reviewer while the model still reads them):
+  - zero-width: U+200B, U+200C, U+200D, U+FEFF;
+  - bidirectional controls: U+202A–U+202E, U+2066–U+2069;
+  - Unicode Tags block: U+E0000–U+E007F;
+  - any other Unicode `Cc` (control) or `Cf` (format) codepoint, **except** the
+    ordinary whitespace `\t` (U+0009), `\n` (U+000A), `\r` (U+000D).
+  Rationale names the offending codepoint(s) (e.g. `U+200B`). `severity: high`,
+  `confidence: 0.95` (presence is unambiguous).
+
+- **P2 — Hidden directive / instruction injection → `tool.poisoning`.**
+  Flag text containing an imperative aimed at the *agent* rather than describing
+  the tool. Canonical (case-insensitive) seed set — extensible as a constant,
+  each new pattern needing a test:
+  - `ignore (all |the )?(previous|prior|above) instructions`
+  - `disregard .*instructions`
+  - `do not (tell|inform|mention to|reveal to) the user`
+  - `without (telling|informing|alerting) the user`
+  - `system prompt`
+  - injected directive blocks: `<important>…</important>`, `<system>…</system>`,
+    `[system]…`
+  Rationale quotes the matched phrase. `severity: high`, `confidence: 0.85`.
+
+- **P3 — Exfiltration instruction → `tool.exfiltration`.**
+  Flag text that pairs an **egress verb** (`send|forward|post|upload|exfiltrate|
+  email|leak|transmit`) with **either** an external destination (`https?://…`,
+  `ftp://…`, or an email address) **or** a sensitive-source token
+  (`~/.ssh`, `id_rsa`, `\.env`, `api[_ ]?key`, `password`, `secret`,
+  `credentials`, `access[_ ]?token`). Rationale names the verb + target.
+  `severity: critical`, `confidence: 0.8`.
+
+- **P0 — Clean text yields nothing.** A `Manifest` whose text contains none of
+  the above produces **zero** `Finding`s (no false positives on ordinary tool
+  descriptions). This is a first-class rule: the suite must prove benign,
+  realistic descriptions stay silent.
+
+Acceptance (F2): given a `Manifest`, the detector returns a deterministic,
+canonically-ordered `list[Finding]` with the correct `finding_type`,
+`entity_ref`, `severity`, `confidence`, and a rationale citing the match;
+benign manifests yield `[]`; every rule P1–P3 has positive and negative tests.
 
 ### 3.3 Over-privilege & schema  (feature F3 — _to be filled when F3 starts_)
 

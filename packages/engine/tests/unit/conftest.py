@@ -10,10 +10,19 @@ attributes so normalization defaults (R6) can be exercised.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Sequence
 from types import SimpleNamespace
 from typing import Any, Callable
 
 import pytest
+
+from attestable_engine.enumerate.manifest import (
+    Manifest,
+    PromptRecord,
+    ResourceRecord,
+    ToolRecord,
+    build_manifest,
+)
 
 
 class FakeSession:
@@ -113,5 +122,20 @@ def make_prompt() -> Callable[..., SimpleNamespace]:
 def fake_session() -> Callable[..., FakeSession]:
     def _make(**kw: Any) -> FakeSession:
         return FakeSession(**kw)
+
+    return _make
+
+
+@pytest.fixture
+def make_manifest() -> Callable[..., Manifest]:
+    """Build a Manifest directly from records — no Session, no network (F2 detect tests)."""
+
+    def _make(
+        *,
+        tools: Sequence[ToolRecord] = (),
+        resources: Sequence[ResourceRecord] = (),
+        prompts: Sequence[PromptRecord] = (),
+    ) -> Manifest:
+        return build_manifest(list(tools), list(resources), list(prompts), transport="stdio")
 
     return _make
