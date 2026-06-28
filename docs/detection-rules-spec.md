@@ -8,7 +8,8 @@
 > **Architecture law:** rules emit `finding_type` only — never a regulation.
 > Mapping lives in `control_plane/packs/*.yaml`. (CLAUDE.md.)
 >
-> Status: §1, §2, §3.1 filled (F1). §3.2+ filled per feature as we reach them.
+> Status: §1, §2, §3.1 filled (F1); §3.2 (F2); §3.3 (F3). §4+ filled per feature
+> as we reach them.
 
 ## 1. Purpose & scope
 
@@ -175,7 +176,92 @@ canonically-ordered `list[Finding]` with the correct `finding_type`,
 `entity_ref`, `severity`, `confidence`, and a rationale citing the match;
 benign manifests yield `[]`; every rule P1–P3 has positive and negative tests.
 
-### 3.3 Over-privilege & schema  (feature F3 — _to be filled when F3 starts_)
+### 3.3 Over-privilege & schema  (feature F3, layer: engine)
+
+Deterministic detection (no LLM) over the normalized `Manifest`'s **tools**.
+Two threat classes (TDD §07 "over-privileged primitives (shell/file/SQL/egress),
+missing/unbounded schema validation"; PRD FR-03, P0):
+
+1. **Over-privilege** — a tool exposes a hazardous capability (shell execution,
+   file mutation, raw SQL, network egress). Such tools widen the blast radius of
+   a compromise (MCP "scope minimization";
+   `docs/references/mcp-security-best-practices.md`).
+2. **Schema weakness** — a tool accepts input with no / unbounded validation,
+   so a caller (or a poisoned upstream) can pass arbitrary or oversized values.
+
+Only **tools** are scanned: capabilities and `input_schema` are tool concepts
+(resources/prompts carry neither in the normalized model). The detector emits
+`Finding`s (§2.2); it never names a regulation.
+
+**Scanned surface.** Per tool: for over-privilege, `name` + `description` + the
+top-level **property names** of `input_schema` (a `sql`/`command` parameter is a
+capability signal even when the description is terse); for schema weakness, the
+`input_schema` structure. `entity_ref` is `tool:<name>`.
+
+**Determinism.** The same `Manifest` yields the same findings in a canonical
+order: sorted by `(entity_ref, finding_type)`. At most one finding per
+`(entity_ref, finding_type)`; the rationale names every contributing signal.
+
+**Provisional scoring.** Each rule fixes a `severity` and `confidence`; these are
+inputs to §4 (F4) and the F8 packs, which may escalate with context (e.g. PRD
+§08: "raw DB query over a sensitive source" → `critical`). They are not final.
+
+- **O1 — Over-privileged capability → `tool.over_privilege`.**
+  Flag a tool whose scanned surface matches any **capability** seed set below.
+  Matching is **case-insensitive**, except the literal-SQL keywords in raw-sql
+  (`SELECT` / `DROP` / `DELETE FROM` / `INSERT INTO`), which are **case-sensitive**
+  so ordinary English prose does not false-positive. Each set is an extensible
+  constant, each new pattern needing a test. One finding per tool; the rationale
+  lists **every** capability found.
+  - **shell:** `shell`, `bash`, `/bin/sh`, `/bin/bash`, `subprocess`,
+    `os.system`, `shell command`, `system command`,
+    `(execute|run) (a |an |arbitrary )?command`, `arbitrary code`.
+  - **file-write:** `(write|create|delete|remove|overwrite|rename|modify|append)
+    (a |the )?(file|directory|path)`, `chmod`, `mkdir`, `rmdir`, `unlink`,
+    `filesystem write`.
+  - **raw-sql:** `raw sql`, `sql query`, `execute (a |an |arbitrary )?query`,
+    `arbitrary query`, `database query`, `run query`; plus the **case-sensitive**
+    literal-SQL keywords `SELECT`, `DROP`, `DELETE FROM`, `INSERT INTO` (matched
+    case-sensitively so prose like "select a row" / "drop a note" does not
+    false-positive — only literal uppercase SQL counts).
+  - **egress:** `http request`, `https request`, `make (a |an )?request`,
+    `fetch (a )?url`, `outbound`, `webhook`, `network request`, `api call`,
+    `curl`, `external endpoint`.
+  `severity: high`, `confidence: 0.6` (capability presence is a strong but
+  legitimate-use-possible signal — F4/packs refine by context).
+
+- **O2 — Missing input validation → `tool.missing_schema`.**
+  Flag a tool that declares **no** input validation: `input_schema` is empty
+  (`{}` — the R6 default for absent/invalid) or lacks both a `type` and a
+  `properties` key. A genuine no-argument tool declares `{"type":"object",
+  "properties":{}}` and is **not** flagged (it has a schema). Rationale notes the
+  absent validation. `severity: medium`, `confidence: 0.7`.
+
+- **O3 — Unbounded input validation → `tool.unbounded_schema`.**
+  Flag a tool that **has** declared properties but leaves an input unbounded:
+  - a `string` property with none of `maxLength`, `enum`, `pattern`, `format`;
+  - an `array` property with no `maxItems`;
+  - top-level `additionalProperties` is not `false` (arbitrary extra keys).
+  Rationale names the offending property/-ies. `severity: low`, `confidence: 0.5`
+  (omitted bounds are common and not always a real weakness).
+
+- **O0 — Clean tool yields nothing.** A tool with no hazardous-capability signal
+  and a bounded, closed schema produces **zero** `Finding`s. First-class rule:
+  the suite must prove benign, realistic tools stay silent.
+
+O2 and O3 are mutually exclusive (no declared properties ⇒ nothing to be
+unbounded), so a tool carries at most one schema finding.
+
+Acceptance (F3): given a `Manifest`, the detector returns a deterministic,
+canonically-ordered `list[Finding]` with the correct `finding_type`,
+`entity_ref`, `severity`, `confidence`, and a rationale citing the signal;
+benign manifests yield `[]`; every rule O1–O3 has positive and negative tests.
+
+> **Spec-authoring note (owner OQ).** The docs name only `tool.over_privilege`
+> (TDD §08). The two schema `finding_type`s (`tool.missing_schema`,
+> `tool.unbounded_schema`) are introduced here and will need F8 pack entries;
+> the owner may instead prefer a single `tool.weak_schema`. Flagged in the F3
+> journal, not silently assumed.
 
 ## 4. Scoring inputs  (feature F4 — _to be filled when F4 starts_)
 

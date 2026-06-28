@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .connect.errors import TargetUnreachable
 from .connect.session import Transport
-from .detect import detect_poisoning
+from .detect import detect_over_privilege, detect_poisoning
 from .enumerate.manifest import Manifest, PromptRecord, ResourceRecord, ToolRecord
 from .finding import Finding
 from .scan import scan
@@ -17,6 +17,7 @@ __all__ = [
     "PromptRecord",
     "Finding",
     "detect_poisoning",
+    "detect_over_privilege",
     "TargetUnreachable",
     "Transport",
 ]

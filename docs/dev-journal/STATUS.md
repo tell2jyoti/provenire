@@ -7,23 +7,24 @@
 
 ## Now
 
-- **Active feature:** none — **F2 done** (`2abd153`). Next: F3. Log: `F2-poisoning-detection.md`.
-- **Loop step:** F2 complete through step 7 (committed). Ready to start F3.
+- **Active feature:** none — **F3 done** (`f1975c1`). Next: F4. Log: `F3-over-privilege-schema.md`.
+- **Loop step:** F3 complete through step 7 (committed). Ready to start F4.
 - **Branch:** `chore/agent-context-setup`.
-- **Last red:** F2 ReDoS test (4.34s) + P3 scheme-only rationale — both fixed green.
-  · **Last green:** F2, **97 passed**, ruff + mypy strict clean.
-- **Open findings:** none blocking. **Owner OQs** (spec follow-ups, see F2 log
-  §Decisions): (1) duplicate-named-primitive dedup wording; (2) NFKC/homoglyph
-  evasion; (3) invisible-but-not-Cc/Cf chars; (4) payload size cap (F7/R6).
-- **Next action:** Start **F3 (over-privilege + schema)** via `/feature F3`;
-  needs spec §3.3 filled first (currently a stub).
+- **Last red:** F3 import-error (detect_over_privilege) + non-string-key crash +
+  SQL prose FP — all fixed green. · **Last green:** F3, **161 passed**, ruff + mypy strict clean.
+- **Open findings:** none blocking. **Owner OQs** accumulating across F2/F3 logs
+  (§Decisions): F2 — dedup wording, NFKC/homoglyph, non-Cc/Cf invisibles, size
+  cap; F3 — schema finding_type taxonomy, seed breadth, schema-weakness evasion
+  gaps, duplicate-name wording, false `normalize._schema` docstring claim.
+- **Next action:** Start **F4 (scoring)** via `/feature F4`; needs spec §4 filled
+  first (currently a stub) — severity normalization, confidence, suppression.
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
 - **Spec gate cleared:** `detection-rules-spec.md` §1/§2/§3.1 filled from the TDD
   (was a stub). Eyeball before trusting the tests.
 
-_Last updated: 2026-06-28 — F2 committed (`2abd153`, 97 tests). Next: F3._
+_Last updated: 2026-06-28 — F3 committed (`f1975c1`, 161 tests). Next: F4._
 
 ## Phase-1 feature backlog (blueprint §09)
 
@@ -35,7 +36,7 @@ started.
 | --- | --- | --- | --- | --- |
 | F1 | Connect + enumerate | Handshake, list tools/resources/prompts, timeout, manifest hash | engine | ☑ done (`9ba2996`, 41 tests) |
 | F2 | Poisoning detection | Hidden-directive, invisible-unicode, exfil patterns vs fixtures | engine | ☑ done (`2abd153`, 97 tests) |
-| F3 | Over-privilege + schema | Shell/file/SQL flags, missing/unbounded schema | engine | ☐ not started |
+| F3 | Over-privilege + schema | Shell/file/SQL flags, missing/unbounded schema | engine | ☑ done (`f1975c1`, 161 tests) |
 | F4 | Scoring | Severity normalization, confidence, suppression | engine | ☐ not started |
 | F5 | Report | JSON + HTML artifact shape, deterministic output | engine | ☐ not started |
 | F6 | CLI | stdio scan, exit codes, CI-fail threshold | cli | ☐ not started |
