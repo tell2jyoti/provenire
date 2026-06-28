@@ -6,7 +6,7 @@
 - **Layer:** engine
 - **Branch:** `chore/agent-context-setup` (F2 built here alongside the context setup; not yet on a dedicated `feature/F2` branch)
 - **Spec source:** docs/detection-rules-spec.md §2.2 (Finding) + §3.2 (P0–P3)
-- **Started:** 2026-06-28 · **Done:** —
+- **Started:** 2026-06-28 · **Done:** 2026-06-28 (`2abd153`)
 
 ## Loop progress (blueprint §06)
 
@@ -17,7 +17,7 @@
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. Every finding fixed test-first; all three re-reviewed **clean**
       (code no-blocking, security HIGH cleared, qa PASS); spec-scope items → OQs
-- [ ] 7. Human read the diff → commit  ← **awaiting owner** (resume after remote dropped mid-F2)
+- [x] 7. Human read the diff → committed (`2abd153`)
 
 ## 1. Architect design
 
@@ -162,4 +162,5 @@ Coverage gaps, all added test-first:
 
 ## Commit
 
-_Pending owner review of the diff (loop step 7)._
+`2abd153` — feat(engine): F2 poisoning detection — invisible-unicode /
+hidden-directive / exfil. Owner approved the diff; 10 files, 97 tests green.
