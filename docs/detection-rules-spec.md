@@ -8,8 +8,8 @@
 > **Architecture law:** rules emit `finding_type` only — never a regulation.
 > Mapping lives in `control_plane/packs/*.yaml`. (CLAUDE.md.)
 >
-> Status: §1, §2, §3.1 filled (F1); §3.2 (F2); §3.3 (F3); §4 scoring (F4). §5+
-> filled per feature as we reach them.
+> Status: §1, §2, §3.1 filled (F1); §3.2 (F2); §3.3 (F3); §4 scoring (F4);
+> §5 report (F5). §6 test fixtures. Later sections filled per feature.
 
 ## 1. Purpose & scope
 
@@ -19,7 +19,7 @@ framework-neutral `Finding` records. No LLM is used in the free engine
 (deterministic by default — TDD §02).
 
 In scope (Phase 1, engine): connect, enumerate, normalize, manifest hash (§3.1);
-poisoning (§3.2); over-privilege & schema (§3.3); scoring (§4).
+poisoning (§3.2); over-privilege & schema (§3.3); scoring (§4); report (§5).
 Out of scope here: target IP blocking / SSRF guard — that is a **request-layer**
 concern on the **hosted** path (F7, TDD §11), not the engine. The CLI engine is
 the sanctioned path for private/RFC-1918 and stdio servers (TDD §03, QA-T2), so
@@ -348,7 +348,92 @@ rule S1–S5 has positive and negative tests, and S0 is proven.
 > introduce a scalar only if F5/F8 need one. (d) Suppressed findings are dropped
 > silently — if audit needs "what was suppressed", revisit as annotate-in-place.
 
-## 5. Test fixtures
+## 5. Report  (feature F5, layer: engine)
+
+Deterministic (no LLM) rendering stage. **Input:** a `Manifest` (§2.1, for
+provenance) + a `ScanResult` (§4, the scored findings + `ScanScore`). **Output:**
+a `Report` = a machine-readable **JSON** string + a human-readable **HTML** string
+(TDD §09 "Emit — JSON result + rendered HTML report"; PRD FR-04; Blueprint §09 F5
+"JSON + HTML artifact shape, deterministic output"). The engine **returns** the
+artifacts as strings — it does **not** write files or name S3 keys; the CLI (F6) /
+hosted API (F7) persist them to `reports/{scan_id}.{json,html}` (TDD §10). Like
+every engine stage it names no regulation (architecture law).
+
+**Purity / determinism (the headline requirement).** `build_report` is a pure
+function of `(manifest, result)`: **no clock, no `scan_id`, no `duration`, no
+randomness**. Run metadata (scan id, timestamp, duration, actor) is a
+**request-layer** concern injected by F6/F7 around this core (TDD §10 response
+envelope), never inside the engine artifact — so the same scan renders
+byte-identical JSON and HTML every time (NFR-04 "reproducible evidence packs").
+
+**Untrusted content.** Every text field in a finding/manifest originates from a
+**hostile** MCP server (a tool `description` can contain `<script>`, quotes,
+control bytes). The HTML renderer therefore **escapes all interpolated text**
+(RP3) — the report is a prime XSS sink. The JSON renderer relies on standard JSON
+string escaping.
+
+### 5.1 Model
+- `Report` (frozen): `json` (str — a serialized JSON document), `html` (str — a
+  complete, standalone HTML document).
+- Public entrypoint: `build_report(manifest: Manifest, result: ScanResult, *,
+  schema_version: str = "1.0") -> Report`.
+
+### 5.2 Rules
+
+- **RP1 — JSON artifact shape.** `report.json` deserializes to an object with
+  exactly these keys:
+  - `schema_version` (str, default `"1.0"`) — lets consumers version the format;
+  - `manifest_hash` (str) — `manifest.manifest_hash` (drift/provenance link);
+  - `transport` (str) — `manifest.transport`;
+  - `summary` (object): `counts` (all four severity keys → int, from
+    `ScanScore.counts`), `worst` (str or `null`), `gate` (`"pass"|"fail"`);
+  - `findings` (array) — one object per **surviving** finding, in `ScanResult`
+    order (F4 risk order), each with exactly `finding_type`, `entity_ref`,
+    `severity`, `confidence` (number), `rationale` (str).
+
+- **RP2 — Deterministic serialization.** Same `(manifest, result,
+  schema_version)` ⇒ **byte-identical** `json` and `html`. Serialization is
+  canonical and stable (fixed key order, `ensure_ascii=True`, fixed float repr,
+  no volatile fields). No timestamps/ids/durations anywhere in either artifact.
+
+- **RP3 — HTML artifact (self-contained, escaped, offline).** `report.html` is a
+  complete document (`<!doctype html>…`) that:
+  - renders the summary (gate, worst, counts) and a findings table
+    (finding_type, entity_ref, severity, confidence, rationale), in F4 order;
+  - **escapes every interpolated value** (`&`, `<`, `>`, `"`, `'`) — a finding
+    whose `rationale`/`entity_ref` contains `<script>…` or `"` must appear as
+    inert text, never as live markup or a broken attribute (XSS-safe);
+  - is **offline-readable with no proprietary viewer** (NFR-07): any CSS is
+    inlined; **no external URL / CDN / script fetch**.
+
+- **RP4 — Completeness & consistency.** Every surviving finding in `result`
+  appears exactly once in both artifacts, in the same order; the JSON `summary`
+  and the HTML summary both equal `result.score` (counts/worst/gate), so the
+  numbers a human reads match the machine record.
+
+- **RP0 — Empty scan renders a valid report.** A `ScanResult` with no findings
+  (gate `pass`, all-zero counts, `worst=null`) yields a well-formed JSON object
+  with `findings: []` and a valid HTML document stating no findings — not an
+  error, not an empty string. First-class rule.
+
+Acceptance (F5): given `(manifest, result)`, `build_report` returns a `Report`
+whose `json` parses to the RP1 shape and whose `html` is a standalone escaped
+document (RP3); both are deterministic (RP2), complete/consistent with
+`result` (RP4), and valid for the empty scan (RP0); every rule RP1–RP4 has
+positive tests and the XSS-escaping + determinism rules have explicit adversarial
+tests.
+
+> **Owner OQ (flagged, not assumed).** (a) The engine artifact is deliberately
+> **metadata-free** for determinism; F6/F7 wrap it with `scan_id`/timestamp/
+> `report_url` (TDD §10) — if the owner wants the builder to accept an injected,
+> clearly-separated `run` block, that is an additive F6/F7 change, not an engine
+> one. (b) `schema_version` starts at `"1.0"`; bump policy is an owner call. (c)
+> HTML is intentionally minimal (summary + table); richer "remediation guidance"
+> (PRD FR-04) and signed artifacts (NFR-04) are later increments. (d) The report
+> carries findings + hash provenance, not the full manifest primitives (those
+> live in `manifests/{hash}/{ts}.json`, TDD §10) — revisit if F7 needs them inline.
+
+## 6. Test fixtures
 
 Unit tests use an in-memory `Session` fake constructed with explicit
 tools/resources/prompts (no network, no SDK). Integration tests (marked `slow`)

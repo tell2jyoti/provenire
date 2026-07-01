@@ -7,19 +7,18 @@
 
 ## Now
 
-- **Active feature:** none — **F4 done** (`26b52a1`). Next: F5. Log: `F4-scoring.md`.
-- **Loop step:** F4 complete through step 7 (committed). Ready to start F5.
+- **Active feature:** **F5 (report)** — log `F5-report.md`. **Loop step 1** (architect).
+- **Loop step:** F5 step 1 — spec §5 filled (gate cleared), architect running.
 - **Branch:** `chore/agent-context-setup`.
-- **Last red:** F4 import-error (ScanResult) at collection — fixed green. ·
-  **Last green:** F4, **207 passed**, ruff + mypy strict clean.
+- **Last red:** (F5 not yet red) · **Last green:** F4, **207 passed**, ruff + mypy strict clean.
 - **Open findings:** none blocking. **Owner OQs** accumulating across F2/F3/F4 logs
   (§Decisions): F2 — dedup wording, NFKC/homoglyph, non-Cc/Cf invisibles, size
   cap; F3 — schema finding_type taxonomy, seed breadth, schema-weakness evasion
   gaps, duplicate-name wording, false `normalize._schema` docstring claim; F4 —
   floor/gate defaults, scalar-score deferral, silent suppression.
-- **Next action:** Start **F5 (report)** via `/feature F5`; needs spec §5 filled
-  first (currently a fixtures stub) — JSON + HTML artifact shape, deterministic
-  output. F5 consumes F4's `ScanResult`/`ScanScore`.
+- **Next action:** F5 — write the architect's test list RED (step 2), then minimum
+  code to green (`build_report(manifest, result)` → `Report{json,html}`, spec §5
+  RP0–RP4: deterministic, escaped HTML, metadata-free).
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
