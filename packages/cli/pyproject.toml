@@ -6,8 +6,9 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = ["attestable-engine"]
 
-# NOTE: the `attestable` console script (project.scripts) is added with feature F6,
-# once its entrypoint exists — it would reference product code that does not yet exist.
+# The `attestable` console script (F6): `attestable scan <target>`.
+[project.scripts]
+attestable = "attestable_cli.cli:_console"
 
 [build-system]
 requires = ["hatchling"]

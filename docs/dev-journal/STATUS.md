@@ -7,11 +7,11 @@
 
 ## Now
 
-- **Active feature:** none — **F5 done** (`f855cde`). Next: F6. Log: `F5-report.md`.
-- **Loop step:** F5 complete through step 7 (committed). Ready to start F6.
+- **Active feature:** **F6 (CLI)** — log `F6-cli.md`. **Loop step 1** (architect).
+  First `cli`-layer feature (`packages/cli`). Spec: **new** `docs/cli-spec.md`.
+- **Loop step:** F6 step 1 — cli-spec authored (gate cleared), architect running.
 - **Branch:** `chore/agent-context-setup`.
-- **Last red:** F5 import-error (build_report) at collection — fixed green. ·
-  **Last green:** F5, **248 passed**, ruff + mypy strict clean.
+- **Last red:** (F6 not yet red) · **Last green:** F5, **248 passed**, ruff + mypy strict clean.
 - **Open findings:** none blocking. **Owner OQs** accumulating across F2–F5 logs
   (§Decisions): F2 — dedup wording, NFKC/homoglyph, non-Cc/Cf invisibles, size
   cap; F3 — schema finding_type taxonomy, seed breadth, schema-weakness evasion
@@ -19,12 +19,11 @@
   floor/gate defaults, scalar-score deferral, silent suppression; F5 — run-metadata
   injection point (F6/F7), schema_version bump policy, remediation/signed artifacts,
   JSON float repr cross-platform.
-- **Next action:** Start **F6 (CLI)** via `/feature F6` — **first `cli` layer
-  feature** (leaves `packages/engine`). Backlog: stdio scan, exit codes, CI-fail
-  threshold. Wires the F1→F5 pipeline (scan → detect → score → report) behind
-  `attestable scan <url>`; `--fail-on` maps to F4's `gate_threshold`. Likely needs
-  a spec section (CLI contract: args, exit codes, output modes) authored first —
-  check whether it lives in detection-rules-spec or a new cli-spec/TDD §03.
+- **Next action:** F6 — write the architect's test list RED (step 2), then minimum
+  code to green in `packages/cli/src/attestable_cli/` (`run_scan`/`main`, spec
+  cli-spec C0–C6: injected `connect`, F1→F5 wiring, exit codes 0/1/2/3, `--fail-on`,
+  `--json`/`--output`). Console script `attestable` added to cli pyproject.
+  Owner decisions locked: transport injected/deferred (C6 stub); distinct exit codes.
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
