@@ -8,7 +8,7 @@
 - **Spec source:** docs/detection-rules-spec.md §5 (RP0–RP4); derived from TDD §09
   (Emit JSON+HTML) / §10 (S3 `reports/{scan_id}.{json,html}`, API envelope),
   PRD FR-04 + NFR-04/07, Blueprint §09 F5. Consumes F4 `ScanResult`/`ScanScore`.
-- **Started:** 2026-07-01 · **Done:** —
+- **Started:** 2026-07-01 · **Done:** 2026-07-01 (`f855cde`)
 
 ## Loop progress (blueprint §06)
 
@@ -19,7 +19,7 @@
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. qa FAIL-1 fixed test-first; qa **re-audit PASS**; code + security **clean**
       first pass (248 passed, ruff + mypy --strict clean)
-- [ ] 7. Human read the diff → commit  ← **awaiting owner**
+- [x] 7. Human read the diff → committed (`f855cde`)
 
 ## 1. Architect design
 _Ordered test list (each derived from a spec rule — cite it). Modules/data flow.
@@ -155,4 +155,6 @@ awaiting human diff read.
    primitives (those live in `manifests/{hash}/{ts}.json`) — revisit if F7 needs.
 
 ## Commit
-_Hash + message once the human approves._
+
+`f855cde` — feat(engine): F5 report — deterministic JSON + escaped self-contained
+HTML artifact. Owner approved the diff; 7 files, 248 tests green.

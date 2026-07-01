@@ -7,25 +7,31 @@
 
 ## Now
 
-- **Active feature:** **F5 (report)** — log `F5-report.md`. **Loop step 1** (architect).
-- **Loop step:** F5 step 1 — spec §5 filled (gate cleared), architect running.
+- **Active feature:** none — **F5 done** (`f855cde`). Next: F6. Log: `F5-report.md`.
+- **Loop step:** F5 complete through step 7 (committed). Ready to start F6.
 - **Branch:** `chore/agent-context-setup`.
-- **Last red:** (F5 not yet red) · **Last green:** F4, **207 passed**, ruff + mypy strict clean.
-- **Open findings:** none blocking. **Owner OQs** accumulating across F2/F3/F4 logs
+- **Last red:** F5 import-error (build_report) at collection — fixed green. ·
+  **Last green:** F5, **248 passed**, ruff + mypy strict clean.
+- **Open findings:** none blocking. **Owner OQs** accumulating across F2–F5 logs
   (§Decisions): F2 — dedup wording, NFKC/homoglyph, non-Cc/Cf invisibles, size
   cap; F3 — schema finding_type taxonomy, seed breadth, schema-weakness evasion
   gaps, duplicate-name wording, false `normalize._schema` docstring claim; F4 —
-  floor/gate defaults, scalar-score deferral, silent suppression.
-- **Next action:** F5 — write the architect's test list RED (step 2), then minimum
-  code to green (`build_report(manifest, result)` → `Report{json,html}`, spec §5
-  RP0–RP4: deterministic, escaped HTML, metadata-free).
+  floor/gate defaults, scalar-score deferral, silent suppression; F5 — run-metadata
+  injection point (F6/F7), schema_version bump policy, remediation/signed artifacts,
+  JSON float repr cross-platform.
+- **Next action:** Start **F6 (CLI)** via `/feature F6` — **first `cli` layer
+  feature** (leaves `packages/engine`). Backlog: stdio scan, exit codes, CI-fail
+  threshold. Wires the F1→F5 pipeline (scan → detect → score → report) behind
+  `attestable scan <url>`; `--fail-on` maps to F4's `gate_threshold`. Likely needs
+  a spec section (CLI contract: args, exit codes, output modes) authored first —
+  check whether it lives in detection-rules-spec or a new cli-spec/TDD §03.
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
 - **Spec gate cleared:** `detection-rules-spec.md` §1/§2/§3.1 filled from the TDD
   (was a stub). Eyeball before trusting the tests.
 
-_Last updated: 2026-07-01 — F4 committed (`26b52a1`, 207 tests). Next: F5._
+_Last updated: 2026-07-01 — F5 committed (`f855cde`, 248 tests). Next: F6._
 
 ## Phase-1 feature backlog (blueprint §09)
 
@@ -39,7 +45,7 @@ started.
 | F2 | Poisoning detection | Hidden-directive, invisible-unicode, exfil patterns vs fixtures | engine | ☑ done (`2abd153`, 97 tests) |
 | F3 | Over-privilege + schema | Shell/file/SQL flags, missing/unbounded schema | engine | ☑ done (`f1975c1`, 161 tests) |
 | F4 | Scoring | Severity normalization, confidence, suppression | engine | ☑ done (`26b52a1`, 207 tests) |
-| F5 | Report | JSON + HTML artifact shape, deterministic output | engine | ☐ not started |
+| F5 | Report | JSON + HTML artifact shape, deterministic output | engine | ☑ done (`f855cde`, 248 tests) |
 | F6 | CLI | stdio scan, exit codes, CI-fail threshold | cli | ☐ not started |
 | F7 | Scan API + SSRF guard | POST /scan, blocked_target on metadata/RFC-1918, rate limit | control | ☐ not started |
 | F8 | Mapping engine + baseline pack | Loads baseline.yaml, finding_type→control, ControlState, pass & fail | control | ☐ not started |
