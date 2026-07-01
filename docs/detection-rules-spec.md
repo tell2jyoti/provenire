@@ -8,8 +8,8 @@
 > **Architecture law:** rules emit `finding_type` only — never a regulation.
 > Mapping lives in `control_plane/packs/*.yaml`. (CLAUDE.md.)
 >
-> Status: §1, §2, §3.1 filled (F1); §3.2 (F2); §3.3 (F3). §4+ filled per feature
-> as we reach them.
+> Status: §1, §2, §3.1 filled (F1); §3.2 (F2); §3.3 (F3); §4 scoring (F4). §5+
+> filled per feature as we reach them.
 
 ## 1. Purpose & scope
 
@@ -263,7 +263,90 @@ benign manifests yield `[]`; every rule O1–O3 has positive and negative tests.
 > the owner may instead prefer a single `tool.weak_schema`. Flagged in the F3
 > journal, not silently assumed.
 
-## 4. Scoring inputs  (feature F4 — _to be filled when F4 starts_)
+## 4. Scoring  (feature F4, layer: engine)
+
+Deterministic (no LLM) post-detection stage. **Input:** the combined
+`list[Finding]` emitted by every §3.2+ detector (poisoning + over-privilege &
+schema). **Output:** a `ScanResult` = the normalized, risk-ordered surviving
+findings plus a `ScanScore` aggregate. Scoring is pure arithmetic/ordering over
+findings — it names **no** regulation (architecture law), and it does **not**
+re-classify by context (severity escalation "raw DB query over a sensitive
+source → critical" is deliberately deferred to F8 packs, §3.3 provisional-scoring
+note). F4's job is to normalize the *provisional* severity/confidence the
+detectors set (§3.2/§3.3) into a stable, report-ready ranking + summary that F5
+(report) and F6 (CLI `--fail-on` threshold) consume.
+
+### 4.1 Model
+
+- `severity` keeps the four §2.2 levels with a fixed total order
+  `critical > high > medium > low`, realized by an internal **rank**
+  (`critical=4, high=3, medium=2, low=1`). The rank is a scoring internal — it is
+  **not** added to `Finding` (the §2.2 five-field contract is frozen).
+- `ScanScore` (frozen): `counts` (a mapping with **all four** severity keys
+  present, value = number of surviving findings at that level), `worst` (the
+  highest severity present among survivors, or `None` if none), `gate`
+  (`"pass" | "fail"`).
+- `ScanResult` (frozen): `findings` (tuple of surviving, normalized, risk-ordered
+  `Finding`s) + `score` (`ScanScore`).
+
+### 4.2 Rules
+
+- **S1 — Severity is ordinal, never rewritten.** Scoring uses the total order
+  (rank) to sort and aggregate but **never changes** a finding's `severity`
+  (context escalation is F8). Severity is a mypy `Literal`, so an out-of-enum
+  value is a programming error, not runtime input; scoring may assume validity.
+
+- **S2 — Confidence is clamped.** Each finding's `confidence` is normalized into
+  `[0.0, 1.0]` (defensive: it is contractually a probability). Clamping yields a
+  **new** frozen `Finding` (the input finding is never mutated); a finding already
+  in range passes through with an equal value.
+
+- **S3 — Suppression by confidence floor.** A finding whose (clamped) `confidence`
+  is **strictly below** `confidence_floor` is **removed** from the result
+  entirely — absent from `findings` **and** from `counts`/`worst`/`gate`.
+  `confidence_floor` is a parameter of the scoring call; **default `0.5`**. At the
+  default nothing drops (the lowest provisional confidence is O3's `0.5`, and
+  `0.5 < 0.5` is false) — the floor is a live knob that is inert until the owner
+  tunes it, so F4 changes no current finding output, only adds ordering + summary.
+
+- **S4 — Deterministic risk order.** Surviving findings are ordered
+  **highest-risk first** by the total-order key
+  `(rank desc, confidence desc, entity_ref asc, finding_type asc)`. The trailing
+  `entity_ref`/`finding_type` keys make the order total and deterministic even
+  when rank+confidence tie, and stay consistent with the detectors' canonical
+  `(entity_ref, finding_type)` tiebreak. Same findings in ⇒ same order out (a
+  stable, input-order-independent sort).
+
+- **S5 — `ScanScore` aggregate.** Computed over the **survivors** (post-S3):
+  - `counts` — surviving-finding count per severity; all four keys present
+    (`0` when none).
+  - `worst` — the highest severity among survivors, else `None`.
+  - `gate` — `"fail"` if any survivor has `rank >= rank(gate_threshold)`, else
+    `"pass"`. `gate_threshold` is a parameter of the scoring call, **default
+    `"high"`** (F6 wires the CLI `--fail-on`). No survivors ⇒ `"pass"`.
+
+- **S0 — Empty in, empty out.** No input findings (or all suppressed) ⇒ a
+  `ScanResult` with empty `findings`, all-zero `counts`, `worst=None`,
+  `gate="pass"`. First-class rule.
+
+**Determinism.** `score_findings` is a pure function of
+`(findings, confidence_floor, gate_threshold)` — no clock, no randomness, no
+input-order dependence (S4). Idempotent: scoring an already-scored result's
+findings yields the same result.
+
+Acceptance (F4): given a `list[Finding]`, `score_findings(findings, *,
+confidence_floor=0.5, gate_threshold="high")` returns a `ScanResult` whose
+findings are clamped (S2), floor-suppressed (S3) and risk-ordered (S4), carrying
+a `ScanScore` per S5; output is deterministic and input-order-independent; every
+rule S1–S5 has positive and negative tests, and S0 is proven.
+
+> **Owner OQ (flagged, not assumed).** (a) `confidence_floor` default `0.5` is
+> deliberately inert today; the owner sets the real production floor. (b)
+> `gate_threshold` default `"high"` is F4's guess at the CI-fail line — F6 owns
+> the final CLI default. (c) The `severity`×`confidence` combination is kept as
+> two ordered keys (S4), **not** collapsed into a single scalar risk score;
+> introduce a scalar only if F5/F8 need one. (d) Suppressed findings are dropped
+> silently — if audit needs "what was suppressed", revisit as annotate-in-place.
 
 ## 5. Test fixtures
 

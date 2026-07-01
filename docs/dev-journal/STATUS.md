@@ -7,17 +7,17 @@
 
 ## Now
 
-- **Active feature:** none — **F3 done** (`f1975c1`). Next: F4. Log: `F3-over-privilege-schema.md`.
-- **Loop step:** F3 complete through step 7 (committed). Ready to start F4.
+- **Active feature:** **F4 (scoring)** — log `F4-scoring.md`. **Loop step 1** (architect).
+- **Loop step:** F4 step 1 — spec §4 filled (gate cleared), architect running.
 - **Branch:** `chore/agent-context-setup`.
-- **Last red:** F3 import-error (detect_over_privilege) + non-string-key crash +
-  SQL prose FP — all fixed green. · **Last green:** F3, **161 passed**, ruff + mypy strict clean.
-- **Open findings:** none blocking. **Owner OQs** accumulating across F2/F3 logs
+- **Last red:** (F4 not yet red) · **Last green:** F3, **161 passed**, ruff + mypy strict clean.
+- **Open findings:** none blocking. **Owner OQs** accumulating across F2/F3/F4 logs
   (§Decisions): F2 — dedup wording, NFKC/homoglyph, non-Cc/Cf invisibles, size
   cap; F3 — schema finding_type taxonomy, seed breadth, schema-weakness evasion
-  gaps, duplicate-name wording, false `normalize._schema` docstring claim.
-- **Next action:** Start **F4 (scoring)** via `/feature F4`; needs spec §4 filled
-  first (currently a stub) — severity normalization, confidence, suppression.
+  gaps, duplicate-name wording, false `normalize._schema` docstring claim; F4 —
+  floor/gate defaults, scalar-score deferral, silent suppression.
+- **Next action:** F4 — write the architect's test list RED (step 2), then minimum
+  code to green (`score_findings` → `ScanResult`/`ScanScore`, spec §4 S0–S5).
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
