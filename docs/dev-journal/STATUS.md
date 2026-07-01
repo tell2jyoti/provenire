@@ -7,24 +7,26 @@
 
 ## Now
 
-- **Active feature:** **F4 (scoring)** — log `F4-scoring.md`. **Loop step 1** (architect).
-- **Loop step:** F4 step 1 — spec §4 filled (gate cleared), architect running.
+- **Active feature:** none — **F4 done** (`26b52a1`). Next: F5. Log: `F4-scoring.md`.
+- **Loop step:** F4 complete through step 7 (committed). Ready to start F5.
 - **Branch:** `chore/agent-context-setup`.
-- **Last red:** (F4 not yet red) · **Last green:** F3, **161 passed**, ruff + mypy strict clean.
+- **Last red:** F4 import-error (ScanResult) at collection — fixed green. ·
+  **Last green:** F4, **207 passed**, ruff + mypy strict clean.
 - **Open findings:** none blocking. **Owner OQs** accumulating across F2/F3/F4 logs
   (§Decisions): F2 — dedup wording, NFKC/homoglyph, non-Cc/Cf invisibles, size
   cap; F3 — schema finding_type taxonomy, seed breadth, schema-weakness evasion
   gaps, duplicate-name wording, false `normalize._schema` docstring claim; F4 —
   floor/gate defaults, scalar-score deferral, silent suppression.
-- **Next action:** F4 — write the architect's test list RED (step 2), then minimum
-  code to green (`score_findings` → `ScanResult`/`ScanScore`, spec §4 S0–S5).
+- **Next action:** Start **F5 (report)** via `/feature F5`; needs spec §5 filled
+  first (currently a fixtures stub) — JSON + HTML artifact shape, deterministic
+  output. F5 consumes F4's `ScanResult`/`ScanScore`.
 - **Design seam:** engine core is built against a `Session` Protocol (initialize /
   list_tools / list_resources / list_prompts); unit tests use an in-memory fake —
   no network, no `mcp` SDK (not installed). Real SDK adapter wired later.
 - **Spec gate cleared:** `detection-rules-spec.md` §1/§2/§3.1 filled from the TDD
   (was a stub). Eyeball before trusting the tests.
 
-_Last updated: 2026-06-28 — F3 committed (`f1975c1`, 161 tests). Next: F4._
+_Last updated: 2026-07-01 — F4 committed (`26b52a1`, 207 tests). Next: F5._
 
 ## Phase-1 feature backlog (blueprint §09)
 
@@ -37,7 +39,7 @@ started.
 | F1 | Connect + enumerate | Handshake, list tools/resources/prompts, timeout, manifest hash | engine | ☑ done (`9ba2996`, 41 tests) |
 | F2 | Poisoning detection | Hidden-directive, invisible-unicode, exfil patterns vs fixtures | engine | ☑ done (`2abd153`, 97 tests) |
 | F3 | Over-privilege + schema | Shell/file/SQL flags, missing/unbounded schema | engine | ☑ done (`f1975c1`, 161 tests) |
-| F4 | Scoring | Severity normalization, confidence, suppression | engine | ☐ not started |
+| F4 | Scoring | Severity normalization, confidence, suppression | engine | ☑ done (`26b52a1`, 207 tests) |
 | F5 | Report | JSON + HTML artifact shape, deterministic output | engine | ☐ not started |
 | F6 | CLI | stdio scan, exit codes, CI-fail threshold | cli | ☐ not started |
 | F7 | Scan API + SSRF guard | POST /scan, blocked_target on metadata/RFC-1918, rate limit | control | ☐ not started |

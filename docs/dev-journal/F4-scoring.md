@@ -8,7 +8,7 @@
 - **Spec source:** docs/detection-rules-spec.md §4 (S0–S5); derived from Blueprint
   §09 (F4 row), TDD §07 (pipeline), PRD (severity/confidence). Consumed by F5
   (report) + F6 (CLI `--fail-on`).
-- **Started:** 2026-07-01 · **Done:** —
+- **Started:** 2026-07-01 · **Done:** 2026-07-01 (`26b52a1`)
 
 ## Loop progress (blueprint §06)
 
@@ -19,7 +19,7 @@
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. Fixes applied test-first; code + security **re-reviewed clean**, qa **PASS**
       (207 passed, ruff + mypy --strict clean)
-- [ ] 7. Human read the diff → commit  ← **awaiting owner**
+- [x] 7. Human read the diff → committed (`26b52a1`)
 
 ## 1. Architect design
 _Ordered test list (each derived from a spec rule — cite it). Modules/data flow.
@@ -137,4 +137,6 @@ Definition of done met (green + 3 reviewers clean); awaiting human diff read.
    needs a "what was suppressed" trail.
 
 ## Commit
-_Hash + message once the human approves._
+
+`26b52a1` — feat(engine): F4 scoring — clamp, floor-suppress, risk-order +
+ScanScore gate. Owner approved the diff; 7 files, 207 tests green.
