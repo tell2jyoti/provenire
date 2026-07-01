@@ -8,7 +8,7 @@
 - **Spec source:** docs/cli-spec.md §1–§2 (C0–C6) — **new spec doc** (CLI isn't
   detection-rules or packs). Derived from TDD §03/§07/§10, PRD FR-05 + FR-13,
   Blueprint §09 F6. Wires the F1→F5 engine pipeline.
-- **Started:** 2026-07-01 · **Done:** —
+- **Started:** 2026-07-01 · **Done:** 2026-07-01 (`060bcf4`)
 
 ## Loop progress (blueprint §06)
 
@@ -20,7 +20,7 @@
 - [x] 6. All findings fixed test-first (5 security incl. 2 HIGH, code blocking, 4 qa);
       **all three re-reviewed clean** — security clean, code clean, qa PASS
       (288 passed, ruff + mypy --strict clean)
-- [ ] 7. Human read the diff → commit  ← **awaiting owner**
+- [x] 7. Human read the diff → committed (`060bcf4`)
 
 ## 1. Architect design
 _Ordered test list (each derived from a spec rule — cite it). Modules/data flow.
@@ -176,4 +176,7 @@ with one cosmetic note (combined `--json`+`--output` exit code) → closed with
    retune the CI breach line.
 
 ## Commit
-_Hash + message once the human approves._
+
+`060bcf4` — feat(cli): F6 attestable scan — F1→F5 pipeline, exit codes,
+--fail-on/--json/--output. Owner approved the diff; 6 files, 288 tests green.
+First feature outside `packages/engine`; new `docs/cli-spec.md`.
