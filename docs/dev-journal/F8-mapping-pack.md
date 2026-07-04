@@ -6,7 +6,7 @@
 - **Layer:** control (second `control_plane` / COMMERCIAL feature)
 - **Branch:** `chore/agent-context-setup` (F1–F7 all landed here)
 - **Spec source:** `docs/mapping-pack-spec.md` (distilled here — was a stub)
-- **Started:** 2026-07-04 · **Done:** —
+- **Started:** 2026-07-04 · **Done:** 2026-07-04 (`cfe8d0e`)
 
 ## Kickoff decisions (owner, 2026-07-04)
 
@@ -39,7 +39,7 @@ framework-neutral (`finding_type` only); *all* control/regulation naming lives i
 - [x] 4. Refactor; tests stay green (tuple immutability from review)
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. Every finding fixed; reviews re-run clean (sec CRITICAL withdrawn; code HIGH fixed; qa PASS)
-- [ ] 7. Human read the diff → commit  ← **you are here**
+- [x] 7. Human read the diff → commit (`cfe8d0e`, 2026-07-04)
 
 ## 1. Architect design (2026-07-04)
 
@@ -191,4 +191,7 @@ mypy .` --strict clean.
   not enforced) — reconciles §5 wording with the M3 fail-closed list.
 
 ## Commit
-_Hash + message once the human approves._
+
+`cfe8d0e` — feat(control): F8 mapping engine + baseline pack — finding_type→control,
+ControlState pass/fail/not_applicable, honest N/A. Human-approved 2026-07-04.
+Suite 422 passed; ruff + mypy --strict clean. STATUS flip in the follow-up chore.
