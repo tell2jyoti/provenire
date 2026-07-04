@@ -6,7 +6,7 @@
 - **Layer:** control (first `control_plane` / COMMERCIAL feature)
 - **Branch:** `chore/agent-context-setup` (F1–F6 all landed here)
 - **Spec source:** `docs/scan-api-spec.md` (distilled from TDD §10 + §11)
-- **Started:** 2026-07-04 · **Done:** —
+- **Started:** 2026-07-04 · **Done:** 2026-07-04 (`8e53fc5`)
 
 ## Loop progress (blueprint §06)
 
@@ -16,7 +16,7 @@
 - [x] 4. Refactor; tests stay green (nothing needed — clean at green)
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. Every finding fixed; reviews re-run clean (sec HIGH closed; code 4/4; qa PASS)
-- [ ] 7. Human read the diff → commit  ← **you are here**
+- [x] 7. Human read the diff → commit (`8e53fc5`, 2026-07-04)
 
 ## Kickoff decisions (owner, 2026-07-04)
 
@@ -152,4 +152,7 @@ _See scan-api-spec §8 (OQ-1 pass-count, OQ-2 scan_id scheme, OQ-3 anti-rebindin
 completion with the live transport). Link ADRs for architectural calls._
 
 ## Commit
-_Hash + message once the human approves._
+
+`8e53fc5` — feat(control): F7 scan API + SSRF guard — POST /scan, blocked_target
+on metadata/RFC-1918/link-local, per-IP rate limit. Human-approved 2026-07-04.
+Suite 364 passed; ruff + mypy --strict clean. STATUS flip in the follow-up chore.
