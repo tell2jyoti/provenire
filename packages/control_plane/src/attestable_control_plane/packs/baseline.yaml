@@ -1,0 +1,28 @@
+# baseline — vendor-neutral MCP-security control pack (mapping-pack-spec §3, B0-B5).
+#
+# DATA, NOT CODE. Maps the engine's framework-neutral finding_types to controls.
+# Control ids are vendor-neutral (MCP-*) and name NO regulation — named-regulation
+# packs (HIPAA/SOC2/…) are separate pack files (architecture law: detection ≠
+# mapping; adding a domain = a new pack, never an engine change).
+pack:
+  id: baseline
+  version: 1
+controls:
+  - id: MCP-INJECTION
+    title: Tool metadata is free of prompt-injection / hidden directives
+    breached_by:
+      - tool.poisoning
+      - tool.invisible_unicode
+  - id: MCP-EXFIL
+    title: Tool metadata exposes no data-exfiltration affordance
+    breached_by:
+      - tool.exfiltration
+  - id: MCP-LEASTPRIV
+    title: Tools request least privilege
+    breached_by:
+      - tool.over_privilege
+  - id: MCP-SCHEMA
+    title: Tool input schemas are present and bounded
+    breached_by:
+      - tool.missing_schema
+      - tool.unbounded_schema

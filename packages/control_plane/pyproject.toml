@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Attestable — mapping engine, packs, evidence, and API (commercial / proprietary)."
 requires-python = ">=3.11"
 license = "LicenseRef-Proprietary"
-dependencies = ["attestable-engine"]
+dependencies = ["attestable-engine", "fastapi>=0.110", "pyyaml>=6"]
 
 [build-system]
 requires = ["hatchling"]
