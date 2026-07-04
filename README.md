@@ -105,12 +105,23 @@ files, never as engine code.
 Requires Python ≥ 3.11 and [`uv`](https://docs.astral.sh/uv/).
 
 ```sh
-uv sync                          # create the venv, resolve the workspace
-uv run pytest -q                 # run the test suite
+uv sync                                # create the venv, resolve the workspace
+uv run pytest -q                       # 461 tests
 uv run ruff check . && uv run mypy .   # lint + strict type-check
 ```
 
-Scan an MCP server (open-core CLI):
+That runs the full suite green and type-checks clean — the fastest way to see
+what the engine actually does is to read the tests it derives from.
+
+### Scanning a server
+
+> **Integration boundary — read this first.** The detection pipeline
+> (connect → enumerate → detect → score → report → map → evidence) is fully
+> implemented and unit-tested behind an injectable `connect` factory. The one
+> piece not yet wired is the **live MCP transport adapter**, so `scan` against a
+> real server today exits `3` (unreachable). Wiring stdio + `streamable_http` is
+> the next integration slice ([STATUS.md](docs/dev-journal/STATUS.md)). The CLI
+> surface below is the contract that adapter will plug into.
 
 ```sh
 uv run attestable scan <target> [--fail-on {critical|high|medium|low}] \
@@ -122,10 +133,6 @@ uv run attestable scan <target> [--fail-on {critical|high|medium|low}] \
   `1` if a finding at or above that severity survives.
 - **`--output DIR`** also writes `report.json` + `report.html`.
 - **`--json`** emits the machine-readable report to stdout.
-
-> The live transport adapter is not wired yet, so `scan` against a real server
-> currently exits `3` (unreachable). The full pipeline from a connected session
-> onward is implemented and unit-tested behind an injectable `connect` factory.
 
 **Exit codes** (the CI contract): `0` pass · `1` gate breach · `2` usage error ·
 `3` target unreachable · `4` other scan/output failure. A crash is never
@@ -159,7 +166,7 @@ docs/
   *-spec.md        # detection / cli / scan-api / mapping-pack / evidence specs (tests derive from these)
   references/      # pinned MCP 2025-06-18 security + authorization spec (cite, don't recall)
   dev-journal/     # STATUS.md (where we are) + per-feature logs
-fixtures-servers/  # adversarial MCP fixtures the integration tests scan
+fixtures-servers/  # placeholder for adversarial fixture servers — wired up once the live transport adapter lands (today's tests use in-memory Session fakes)
 infra/             # deployment scaffolding
 ```
 
@@ -182,6 +189,11 @@ a human reads the diff.
 
 ## License
 
-- `packages/engine`, `packages/cli` — **Apache-2.0**.
-- `packages/control_plane` — **proprietary / commercial**. Not covered by the
-  open-source license.
+Attestable is **open-core** — there is no single license over the whole tree
+(see [`LICENSE`](LICENSE) for the overview):
+
+- `packages/engine`, `packages/cli` — **Apache-2.0**
+  ([engine](packages/engine/LICENSE) · [cli](packages/cli/LICENSE)).
+- `packages/control_plane` — **proprietary / commercial**
+  ([license](packages/control_plane/LICENSE)); not covered by the open-source
+  license. Contact tell2jyoti@gmail.com for commercial licensing.
