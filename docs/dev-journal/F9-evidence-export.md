@@ -6,7 +6,7 @@
 - **Layer:** control (third `control_plane` / COMMERCIAL feature)
 - **Branch:** `chore/agent-context-setup` (F1–F8 all landed here)
 - **Spec source:** `docs/evidence-export-spec.md` (distilled here — was absent)
-- **Started:** 2026-07-04 · **Done:** —
+- **Started:** 2026-07-04 · **Done:** 2026-07-04 (`0f01be6`)
 
 ## Kickoff decisions (owner, 2026-07-04)
 
@@ -38,7 +38,7 @@ the pack id/version is data carried through from the pack.
 - [x] 4. Refactor; tests stay green (mypy nits only)
 - [x] 5. code-reviewer + security-reviewer + qa run on the diff
 - [x] 6. Every finding fixed; reviews re-run clean (sec 0; code MEDIUM fixed; qa PASS)
-- [ ] 7. Human read the diff → commit  ← **you are here**
+- [x] 7. Human read the diff → commit (`0f01be6`, 2026-07-04)
 
 ## 1. Architect design
 ### Module & data flow (`.../evidence/bundle.py`)
@@ -158,4 +158,8 @@ mypy .` --strict clean.
   and named-regulation packs (HIPAA/SOC2) as new pack files.
 
 ## Commit
-_Hash + message once the human approves._
+
+`0f01be6` — feat(control): F9 evidence export — deterministic pack-driven evidence
+document, injected provenance, faithful finding text. Human-approved 2026-07-04.
+Suite 461 passed; ruff + mypy --strict clean. **Completes Phase 1 (F1–F9).** STATUS
+flip in the follow-up chore.
