@@ -11,8 +11,9 @@
   (`0f01be6`). No feature is mid-flight.
 - **Loop step:** between phases. There is no F10 in the blueprint §09 backlog —
   next work is **Phase 2** (integration, not a single loop feature): see Next action.
-- **Branch:** `chore/agent-context-setup` (all of F1–F9 landed here; consider
-  opening a PR to `main` for the whole phase).
+- **Branch:** `chore/agent-context-setup` (all of F1–F9 landed here). **Phase-1 PR
+  open: [#4](https://github.com/tell2jyoti/attestable/pull/4)** (`chore/agent-context-setup`
+  → `main`, F1–F9). Merge before starting Phase 2.
 - **Last red:** F9 collection ModuleNotFoundError (`evidence.bundle`) — fixed green. ·
   **Last green:** F9, **461 passed**, ruff + mypy strict clean.
 - **Open findings:** none blocking. **Owner OQs** accumulating across F2–F5 logs
