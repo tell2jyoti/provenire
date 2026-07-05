@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
-from attestable_engine import Finding
+from provenire_engine import Finding
 
 from .pack import Pack, PackRef
 

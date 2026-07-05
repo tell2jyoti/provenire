@@ -3,7 +3,7 @@
 Pydantic models pin the wire shape. The request is validated leniently here and
 policed for status codes in the handler (transport/mode drive 400 vs 402, not a
 blanket 422); the response models are the single source of truth for the 200 and
-error bodies. control_plane may import attestable_engine, never cli — and no
+error bodies. control_plane may import provenire_engine, never cli — and no
 regulation is named (architecture law).
 """
 

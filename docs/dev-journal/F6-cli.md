@@ -35,14 +35,14 @@ Acceptance criteria. Spec gaps flagged + stopped on._
 - **Exit codes (C3):** distinct — `0` pass · `1` gate fail · `2` usage/args ·
   `3` target unreachable.
 
-**Module/data flow (architect).** New `attestable_cli/cli.py`: `run_scan(target,
+**Module/data flow (architect).** New `provenire_cli/cli.py`: `run_scan(target,
 *, fail_on="high", timeout=10.0, transport="stdio", json_out=False,
 output_dir=None, connect=_default_connect) -> int` (sync; `asyncio.run` bridges to
 the async engine) + `main(argv=None) -> int` (stdlib argparse) + `_default_connect`
-(C6 stub → TargetUnreachable). Console script `attestable = cli:_console`
+(C6 stub → TargetUnreachable). Console script `provenire = cli:_console`
 (`raise SystemExit(main())`) added to `packages/cli/pyproject.toml`. Pipeline:
 connect → scan → detect_poisoning+detect_over_privilege → score_findings(
-gate_threshold=fail_on) → build_report. Imports only `attestable_engine` (no
+gate_threshold=fail_on) → build_report. Imports only `provenire_engine` (no
 control_plane).
 
 **Ordered test list (~32; each cites C0–C6; +/-).** `tests/test_cli.py`, local
@@ -78,18 +78,18 @@ stderr (confirmed C4); C5 no-egress has no unit negative (architectural — note
 
 ## 2. Red proof
 
-~32 tests written before `attestable_cli/cli.py` existed; collected RED on the
+~32 tests written before `provenire_cli/cli.py` existed; collected RED on the
 missing module:
 
 ```
 ImportError while importing test module '.../packages/cli/tests/test_cli.py'.
-E   ModuleNotFoundError: No module named 'attestable_cli.cli'
+E   ModuleNotFoundError: No module named 'provenire_cli.cli'
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 ```
 
 ## 3 + 4. Green & refactor
 
-Implemented `packages/cli/src/attestable_cli/cli.py`:
+Implemented `packages/cli/src/provenire_cli/cli.py`:
 - `run_scan(...) -> int` (sync; `asyncio.run` bridges the async engine) — connect
   (injected) → `scan` → `detect_poisoning`+`detect_over_privilege` →
   `score_findings(gate_threshold=fail_on)` → `build_report`; maps gate/errors to
@@ -101,11 +101,11 @@ Implemented `packages/cli/src/attestable_cli/cli.py`:
 - `_parser` — stdlib argparse, `scan` subcommand + `--fail-on/--timeout/
   --transport/--json/--output`; `main(argv, *, connect=_default_connect)`.
 - `_default_connect` — C6 stub raising `TargetUnreachable` (deferred adapter).
-- Console script `attestable = attestable_cli.cli:_console` wired in cli pyproject.
-- Imports only `attestable_engine` (no control_plane).
+- Console script `provenire = provenire_cli.cli:_console` wired in cli pyproject.
+- Imports only `provenire_engine` (no control_plane).
 
-Verified the real console script: `attestable scan srv` → exit 3 + clear message;
-`attestable scan` (no target) → exit 2 usage; `--help` lists all options.
+Verified the real console script: `provenire scan srv` → exit 3 + clear message;
+`provenire scan` (no target) → exit 2 usage; `--help` lists all options.
 
 Final run: **278 passed** (engine 248 + cli 30). ruff + mypy --strict clean (34 files).
 Refactor: hoisted `json`/`sys` imports to module top; dropped an unused
@@ -177,6 +177,6 @@ with one cosmetic note (combined `--json`+`--output` exit code) → closed with
 
 ## Commit
 
-`060bcf4` — feat(cli): F6 attestable scan — F1→F5 pipeline, exit codes,
+`060bcf4` — feat(cli): F6 provenire scan — F1→F5 pipeline, exit codes,
 --fail-on/--json/--output. Owner approved the diff; 6 files, 288 tests green.
 First feature outside `packages/engine`; new `docs/cli-spec.md`.

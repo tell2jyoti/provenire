@@ -103,9 +103,9 @@ def _render_html(payload: dict[str, Any]) -> str:
     parts = [
         "<!doctype html>",
         '<html lang="en"><head><meta charset="utf-8">',
-        "<title>Attestable scan report</title>",
+        "<title>Provenire scan report</title>",
         f"<style>{_CSS}</style></head><body>",
-        "<h1>Attestable scan report</h1>",
+        "<h1>Provenire scan report</h1>",
         "<section>",
         f'<p>Gate: <strong class="gate-{_e(gate)}">{_e(gate)}</strong></p>',
         f"<p>Worst severity: {_e(summary['worst'] if summary['worst'] else 'none')}</p>",

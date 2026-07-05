@@ -59,13 +59,13 @@ missing public symbol:
 
 ```
 ImportError while importing test module '.../tests/unit/test_over_privilege.py'
-E   ImportError: cannot import name 'detect_over_privilege' from 'attestable_engine'
+E   ImportError: cannot import name 'detect_over_privilege' from 'provenire_engine'
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 ```
 
 ## 3 + 4. Green & refactor
 
-Implemented `src/attestable_engine/detect/over_privilege.py`:
+Implemented `src/provenire_engine/detect/over_privilege.py`:
 - O1 `_check_over_privilege` — capability seed sets (shell/file-write/raw-sql/
   egress) over `name` + `description` + schema property names (underscores→spaces
   so phrase seeds match identifiers); one `tool.over_privilege` finding listing

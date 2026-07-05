@@ -1,4 +1,4 @@
-"""cli-spec §2 — the `attestable` CLI (feature F6). Rules C0–C6.
+"""cli-spec §2 — the `provenire` CLI (feature F6). Rules C0–C6.
 
 Unit-tested against an injected in-memory `connect` returning a fake `Session`
 (no network, no `mcp` SDK, no subprocess — matching the engine's own unit
@@ -16,9 +16,9 @@ from typing import Any
 
 import pytest
 
-from attestable_cli.cli import _default_connect, main, run_scan
-from attestable_engine import TargetUnreachable
-from attestable_engine.connect.session import Session, Transport
+from provenire_cli.cli import _default_connect, main, run_scan
+from provenire_engine import TargetUnreachable
+from provenire_engine.connect.session import Session, Transport
 
 Connect = Callable[[str, Transport, float], Awaitable[Session]]
 

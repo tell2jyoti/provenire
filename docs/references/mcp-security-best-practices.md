@@ -5,7 +5,7 @@
 > Condensation of the normative text — the URL is authoritative. Re-pin per
 > `docs/references/INDEX.md`. Read alongside `mcp-authorization.md`.
 
-This is the single most relevant external reference for Attestable: it names the
+This is the single most relevant external reference for Provenire: it names the
 exact threats the engine detects and the SSRF rules `CLAUDE.md` mandates.
 
 ## Attacks & mitigations
@@ -31,7 +31,7 @@ An MCP server accepting tokens not issued *to it* and forwarding them downstream
 circumvents security controls, breaks audit trails, and crosses trust boundaries.
 - MCP servers **MUST NOT** accept any token not explicitly issued for the server.
 
-### Server-Side Request Forgery (SSRF) — **core to Attestable**
+### Server-Side Request Forgery (SSRF) — **core to Provenire**
 A malicious MCP server can populate OAuth-discovery URLs (`resource_metadata`,
 `authorization_servers`, `token_endpoint`, …) pointing at internal resources.
 Attack targets: internal IPs (`192.168.x`, `10.x`), **cloud metadata
@@ -46,7 +46,7 @@ Attack targets: internal IPs (`192.168.x`, `10.x`), **cloud metadata
   encodings custom parsers miss. Prefer a vetted library / egress proxy.
 - Validate redirect targets the same way; beware TOCTOU DNS rebinding (pin DNS
   between check and use; defense in depth).
-- → Attestable mapping: this is the basis of `CLAUDE.md`'s "block link-local
+- → Provenire mapping: this is the basis of `CLAUDE.md`'s "block link-local
   (169.254.0.0/16) & RFC-1918 targets" rule and feature **F7** (Scan API + SSRF
   guard, `blocked_target`).
 
@@ -69,7 +69,7 @@ exfiltration, privilege escalation, DNS-rebinding to localhost).
   sandbox spawned servers with least privilege.
 - Servers meant to run locally **SHOULD** use `stdio` to limit access; if HTTP,
   require an auth token or restricted IPC (unix sockets).
-- → Attestable mapping: aligns with `CLAUDE.md` "stdio = CLI only".
+- → Provenire mapping: aligns with `CLAUDE.md` "stdio = CLI only".
 
 ### OAuth authorization-URL validation (XSS / RCE)
 Malicious servers can return `javascript:`/`data:`/`file:` authorization URLs or

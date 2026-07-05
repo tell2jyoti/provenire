@@ -6,7 +6,7 @@ import dataclasses
 
 import pytest
 
-from attestable_engine import Finding
+from provenire_engine import Finding
 
 
 def test_finding_fields_in_spec_order() -> None:

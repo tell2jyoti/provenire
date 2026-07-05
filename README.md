@@ -1,4 +1,4 @@
-# Attestable
+# Provenire
 
 **MCP security scanning + compliance-evidence generation.** Point it at a
 [Model Context Protocol](https://modelcontextprotocol.io) server and it connects,
@@ -20,7 +20,7 @@ Open-core monorepo, built strictly test-first.
 MCP lets an AI agent call external tools. A malicious or careless MCP server can
 smuggle prompt-injection directives inside tool descriptions, over-request
 privilege (shell/file/SQL access), expose data-exfiltration affordances, or ship
-unbounded input schemas. Attestable audits that attack surface **and** turns the
+unbounded input schemas. Provenire audits that attack surface **and** turns the
 result into the evidence an auditor asks for — without the detection engine ever
 knowing which regulation you care about.
 
@@ -72,7 +72,7 @@ must **never** import `control_plane/`.
 | Package | License | What it is |
 | --- | --- | --- |
 | [`packages/engine`](packages/engine) | **Apache-2.0** (open) | Framework-neutral MCP detection engine: connect → enumerate → detect → score → report |
-| [`packages/cli`](packages/cli) | **Apache-2.0** (open) | `attestable scan <target>` — the sanctioned path for stdio / private servers; scans locally, transmits nothing |
+| [`packages/cli`](packages/cli) | **Apache-2.0** (open) | `provenire scan <target>` — the sanctioned path for stdio / private servers; scans locally, transmits nothing |
 | [`packages/control_plane`](packages/control_plane) | **Proprietary** (commercial) | Mapping engine, YAML control packs, evidence export, and the scan API (with SSRF guard) |
 
 `packages/engine` + `packages/cli` are the free, open-source scanner. The control
@@ -93,7 +93,7 @@ The engine emits six framework-neutral `finding_type`s:
 | `tool.missing_schema` | Tool input has no schema |
 | `tool.unbounded_schema` | Tool input schema is present but unbounded |
 
-The baseline pack ([`packs/baseline.yaml`](packages/control_plane/src/attestable_control_plane/packs/baseline.yaml))
+The baseline pack ([`packs/baseline.yaml`](packages/control_plane/src/provenire_control_plane/packs/baseline.yaml))
 maps those into four **vendor-neutral** controls — `MCP-INJECTION`, `MCP-EXFIL`,
 `MCP-LEASTPRIV`, `MCP-SCHEMA`. Named-regulation packs are added as separate data
 files, never as engine code.
@@ -124,7 +124,7 @@ what the engine actually does is to read the tests it derives from.
 > surface below is the contract that adapter will plug into.
 
 ```sh
-uv run attestable scan <target> [--fail-on {critical|high|medium|low}] \
+uv run provenire scan <target> [--fail-on {critical|high|medium|low}] \
                                 [--transport {stdio|streamable_http}] \
                                 [--timeout SECONDS] [--json] [--output DIR]
 ```
@@ -160,7 +160,7 @@ This is a security product, and the scanner itself is a request-forging risk, so
 ```
 packages/
   engine/          # Apache-2.0 — detection engine (connect · enumerate · detect · score · report)
-  cli/             # Apache-2.0 — `attestable` CLI
+  cli/             # Apache-2.0 — `provenire` CLI
   control_plane/   # Proprietary — mapping · packs · evidence · scan API
 docs/
   *-spec.md        # detection / cli / scan-api / mapping-pack / evidence specs (tests derive from these)
@@ -179,7 +179,7 @@ derive from [`docs/detection-rules-spec.md`](docs/detection-rules-spec.md); pack
 tests from [`docs/mapping-pack-spec.md`](docs/mapping-pack-spec.md). A behaviour
 that isn't in a spec doesn't get built. See
 [`CLAUDE.md`](CLAUDE.md) for the full engineering constitution and
-[`docs/attestable-build-blueprint-v1.html`](docs/attestable-build-blueprint-v1.html)
+[`docs/provenire-build-blueprint-v1.html`](docs/provenire-build-blueprint-v1.html)
 for the workflow.
 
 **Definition of done:** green tests + code review + security review + QA +
@@ -189,7 +189,7 @@ a human reads the diff.
 
 ## License
 
-Attestable is **open-core** — there is no single license over the whole tree
+Provenire is **open-core** — there is no single license over the whole tree
 (see [`LICENSE`](LICENSE) for the overview):
 
 - `packages/engine`, `packages/cli` — **Apache-2.0**

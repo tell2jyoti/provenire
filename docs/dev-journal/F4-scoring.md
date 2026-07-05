@@ -66,13 +66,13 @@ public symbols (`score/__init__.py` was empty):
 
 ```
 ImportError while importing test module '.../tests/unit/test_score.py'.
-E   ImportError: cannot import name 'ScanResult' from 'attestable_engine.score'
+E   ImportError: cannot import name 'ScanResult' from 'provenire_engine.score'
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 ```
 
 ## 3 + 4. Green & refactor
 
-Implemented `src/attestable_engine/score/scoring.py`:
+Implemented `src/provenire_engine/score/scoring.py`:
 - Frozen `ScanScore` (counts / worst / gate) + `ScanResult` (findings tuple + score).
 - `_RANK` internal severity→int map (crit4 high3 med2 low1) — NOT on `Finding`.
 - `_clamp_confidence` (S2) returns a `dataclasses.replace` copy only when out of

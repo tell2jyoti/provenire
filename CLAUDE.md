@@ -1,4 +1,4 @@
-# Attestable — Agent Constitution
+# Provenire — Agent Constitution
 
 ## What this is
 MCP security + compliance-evidence platform. Open-core:
@@ -22,7 +22,7 @@ isn't in a spec, stop and ask — do not invent rules.
 ## Commands
 test:  uv run pytest -q
 lint:  uv run ruff check . && uv run mypy .
-run:   uv run attestable scan <url>
+run:   uv run provenire scan <url>
 
 ## Definition of done
 green tests + code-reviewer pass + security-reviewer pass

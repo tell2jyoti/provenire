@@ -15,9 +15,9 @@ from typing import Any
 
 import pytest
 
-from attestable_engine import Finding, build_report, score_findings
-from attestable_engine.enumerate.manifest import Manifest, ToolRecord, build_manifest
-from attestable_engine.report import Report
+from provenire_engine import Finding, build_report, score_findings
+from provenire_engine.enumerate.manifest import Manifest, ToolRecord, build_manifest
+from provenire_engine.report import Report
 
 
 def _manifest(*tools: ToolRecord, transport: str = "stdio") -> Manifest:

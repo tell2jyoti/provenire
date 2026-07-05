@@ -8,7 +8,7 @@ run the engine's F1->F5 pipeline under a whole-request deadline (S5) -> shape th
 
 The transport/connect/resolver/rate-limiter are all injected (app factory), so
 this is exercised in-process with no live DNS, socket, or wall clock. Reuses
-attestable_engine unchanged; imports no regulation and no cli (architecture law).
+provenire_engine unchanged; imports no regulation and no cli (architecture law).
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import asyncio
 import secrets
 from collections.abc import Awaitable, Callable, Sequence
 
-from attestable_engine import (
+from provenire_engine import (
     ScanResult,
     TargetUnreachable as EngineUnreachable,
     build_report,
@@ -26,7 +26,7 @@ from attestable_engine import (
     scan,
     score_findings,
 )
-from attestable_engine.connect.session import Session, Transport
+from provenire_engine.connect.session import Session, Transport
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 

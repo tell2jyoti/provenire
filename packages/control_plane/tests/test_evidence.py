@@ -4,7 +4,7 @@ Rules EV1-EV13. The evidence document is the pack-driven, deterministic complian
 record: which pack (id+version) judged which controls over which findings. The
 builder is a **pure** function of its inputs + injected provenance — no clock, no
 RNG, no I/O (EV10/EV11). Finding text is recorded verbatim (JSON-escaped), never
-stripped (EV13) — evidence must be faithful. control_plane imports attestable_engine
+stripped (EV13) — evidence must be faithful. control_plane imports provenire_engine
 + the F8 mapping layer (allowed); nothing here imports cli; no regulation is named.
 """
 
@@ -16,12 +16,12 @@ import json
 from typing import Any
 
 import pytest
-from attestable_engine import Finding, ScanResult, score_findings
-from attestable_engine.enumerate.manifest import Manifest, build_manifest
+from provenire_engine import Finding, ScanResult, score_findings
+from provenire_engine.enumerate.manifest import Manifest, build_manifest
 
-from attestable_control_plane.evidence.bundle import Evidence, build_evidence
-from attestable_control_plane.mapping.evaluate import EvaluationResult, evaluate_pack
-from attestable_control_plane.mapping.pack import load_baseline
+from provenire_control_plane.evidence.bundle import Evidence, build_evidence
+from provenire_control_plane.mapping.evaluate import EvaluationResult, evaluate_pack
+from provenire_control_plane.mapping.pack import load_baseline
 
 ALL_TYPES = {
     "tool.poisoning",

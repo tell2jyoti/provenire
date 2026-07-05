@@ -13,8 +13,8 @@ import dataclasses
 
 import pytest
 
-from attestable_engine import Finding
-from attestable_engine.score import ScanResult, ScanScore, score_findings
+from provenire_engine import Finding
+from provenire_engine.score import ScanResult, ScanScore, score_findings
 
 
 def _f(

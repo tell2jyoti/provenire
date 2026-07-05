@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Attestable — Engineering Workflow &amp; Repo Blueprint (v1.0)</title>
+<title>Provenire — Engineering Workflow &amp; Repo Blueprint (v1.0)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -91,7 +91,7 @@
 <header class="masthead">
   <div class="wrap">
     <p class="eyebrow">Engineering Workflow · Repo Blueprint · Agent Loop</p>
-    <h1>Attestable — Build Blueprint</h1>
+    <h1>Provenire — Build Blueprint</h1>
     <p class="tagline">How the codebase is laid out and how Claude Code builds it: a test-first repo, a constitution the agent reads every session, and an architect → reviewer → QA panel that gates every feature before it reaches git.</p>
     <dl class="docmeta">
       <div><dt>Version</dt><dd>1.1 (pack-aware)</dd></div>
@@ -143,10 +143,10 @@
   <section id="s2">
     <span class="sec-num">SECTION 02</span>
     <h2>Machine setup (one time)</h2>
-    <p>This is the Vizuara workflow mapped to Attestable. Heavy compute isn't the point here (no GPUs needed — this is CPU work), so the dev box can be small and stopped when idle.</p>
+    <p>This is the Vizuara workflow mapped to Provenire. Heavy compute isn't the point here (no GPUs needed — this is CPU work), so the dev box can be small and stopped when idle.</p>
     <ol>
       <li><strong>EC2 (Ubuntu).</strong> Launch a small instance — a <code>t4g.small</code> mirrors the production target and runs the engine + tests comfortably. Create and save the key pair; allow inbound SSH (22) from your IP; attach an Elastic IP so the address is stable. Set a <strong>billing alert on day one</strong>.</li>
-      <li><strong>VS Code Remote-SSH.</strong> Add the box to <code>~/.ssh/config</code> as <code>Host attestable-dev</code>, then <em>Remote-SSH: Connect to Host</em>. Your editor and terminal now run on the server.</li>
+      <li><strong>VS Code Remote-SSH.</strong> Add the box to <code>~/.ssh/config</code> as <code>Host provenire-dev</code>, then <em>Remote-SSH: Connect to Host</em>. Your editor and terminal now run on the server.</li>
       <li><strong>tmux + Claude Code on the server.</strong> <code>sudo apt install tmux</code>; install Claude Code with the native installer; start a session per feature.</li>
       <li><strong>Secrets as env vars, never in code.</strong> AWS keys, the Neon connection string, and any model key go in a project <code>.env</code> that is git-ignored — enforced by a hook (§07).</li>
     </ol>
@@ -154,7 +154,7 @@
 sudo apt update &amp;&amp; sudo apt install -y tmux git
 curl -fsSL https://claude.ai/install.sh | bash
 tmux new -s feat-connect      <span class="c"># one session per feature</span>
-cd attestable &amp;&amp; claude        <span class="c"># Claude Code reads CLAUDE.md on launch</span></pre>
+cd provenire &amp;&amp; claude        <span class="c"># Claude Code reads CLAUDE.md on launch</span></pre>
     <div class="callout warn">
       <p class="label">Guardrail</p>
       <p style="margin:0;">Stop the dev instance when idle (a stopped box bills only for disk). The two classic surprise bills are an idle instance and a leaked key in git history — the hooks in §07 defend the second; the billing alert defends the first.</p>
@@ -165,7 +165,7 @@ cd attestable &amp;&amp; claude        <span class="c"># Claude Code reads CLAUD
     <span class="sec-num">SECTION 03</span>
     <h2>Repository structure</h2>
     <p>The open-core boundary from the TDD becomes <em>directories</em>, so licensing is unambiguous: <span class="tag open">OPEN</span> Apache-2.0, <span class="tag comm">COMMERCIAL</span> proprietary. Tests live beside the code they cover; the spec and fixtures are first-class.</p>
-    <div class="filetree">attestable/
+    <div class="filetree">provenire/
 ├── <span class="dir">CLAUDE.md</span>                      <span class="cm"># root constitution — read every session</span>
 ├── README.md   ·  pyproject.toml  ·  uv.lock
 ├── .gitignore  ·  .env.example
@@ -186,7 +186,7 @@ cd attestable &amp;&amp; claude        <span class="c"># Claude Code reads CLAUD
 ├── .mcp.json                      <span class="cm"># dev-time MCP servers for Claude Code</span>
 ├── <span class="dir">packages/</span>
 │   ├── <span class="dir">engine/</span>      <span class="o">OPEN</span>          <span class="cm"># the core build</span>
-│   │   ├── src/attestable_engine/
+│   │   ├── src/provenire_engine/
 │   │   │   ├── connect/           <span class="cm"># MCP client: stdio + streamable-http</span>
 │   │   │   ├── enumerate/  ·  detect/  ·  score/  ·  report/
 │   │   └── tests/                 <span class="cm"># test-first lives here</span>
@@ -212,7 +212,7 @@ cd attestable &amp;&amp; claude        <span class="c"># Claude Code reads CLAUD
     <h2>Claude Code context files</h2>
     <h3>CLAUDE.md — the constitution</h3>
     <p>Read on every session start. Keep it tight; long reference material belongs in skills (loaded on demand), not here.</p>
-    <pre><span class="c"># Attestable — Agent Constitution</span>
+    <pre><span class="c"># Provenire — Agent Constitution</span>
 
 <span class="k">## What this is</span>
 MCP security + compliance-evidence platform. Open-core:
@@ -236,7 +236,7 @@ isn't in a spec, stop and ask — do not invent rules.
 <span class="k">## Commands</span>
 test:  uv run pytest -q
 lint:  uv run ruff check . &amp;&amp; uv run mypy .
-run:   uv run attestable scan &lt;url&gt;
+run:   uv run provenire scan &lt;url&gt;
 
 <span class="k">## Definition of done</span>
 green tests + code-reviewer pass + security-reviewer pass
@@ -400,7 +400,7 @@ exit 0</pre>
     </ul>
 
     <div class="footer">
-      <p>Attestable · Build Blueprint v1.0 · QA-passed draft for owner review · companion to PRD + TDD v1.0<br>
+      <p>Provenire · Build Blueprint v1.0 · QA-passed draft for owner review · companion to PRD + TDD v1.0<br>
       Claude Code file formats (subagents, hooks, skills, MCP) verified mid-2026; re-check with <code>/help</code> as the tool ships fast.</p>
     </div>
   </section>

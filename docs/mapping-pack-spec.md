@@ -10,7 +10,7 @@
 > emits `finding_type` only and never names a regulation. All control/regulation
 > naming lives here in `control_plane/packs/*.yaml` as **data**. Adding a
 > regulated domain = a new pack file, never an engine change. control_plane may
-> import `attestable_engine`; engine/cli must never import control_plane.
+> import `provenire_engine`; engine/cli must never import control_plane.
 >
 > Status: §1–§6 filled for **F8** (mapping engine + `baseline` pack). Distilled
 > 2026-07-04 with owner sign-off (F8 log §Kickoff); the TDD is external. Named-

@@ -21,7 +21,7 @@
 - [ ] 7. Human read the diff → commit  ← **awaiting owner**
 
 ## 1. Architect design
-Single public entrypoint `attestable_engine.scan(session, *, transport, timeout=10.0)`.
+Single public entrypoint `provenire_engine.scan(session, *, transport, timeout=10.0)`.
 Data flow: `Session` (Protocol) → `connect.handshake` (R1/R2) → `enumerate.collect`
 (R4, each call timeout-bounded) → `enumerate.normalize` (R6 defaults) →
 `enumerate.manifest.build_manifest` (R5: canonical sort → sha256).
@@ -43,8 +43,8 @@ Architect flags (spec silent → decided, not invented):
 Before any source existed, `uv run pytest packages/engine/tests/unit -q`:
 ```
 ERROR ... test_manifest_hash.py / test_normalize.py / test_scan.py
-E   ModuleNotFoundError: No module named 'attestable_engine.enumerate.normalize'
-E   ImportError: cannot import name 'scan' from 'attestable_engine'
+E   ModuleNotFoundError: No module named 'provenire_engine.enumerate.normalize'
+E   ImportError: cannot import name 'scan' from 'provenire_engine'
 !!! Interrupted: 3 errors during collection !!!
 ```
 Legitimate red: the tests reference code that did not yet exist.

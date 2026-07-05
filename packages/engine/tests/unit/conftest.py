@@ -16,7 +16,7 @@ from typing import Any, Callable
 
 import pytest
 
-from attestable_engine.enumerate.manifest import (
+from provenire_engine.enumerate.manifest import (
     Manifest,
     PromptRecord,
     ResourceRecord,

@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 import pytest
 
-from attestable_engine import (
+from provenire_engine import (
     Finding,
     PromptRecord,
     ResourceRecord,

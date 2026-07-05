@@ -30,13 +30,13 @@ Asked before spawning the architect because they change what gets built:
 3. **Spec artifact:** wrote `docs/scan-api-spec.md` first (distilled TDD §10/§11)
    so tests cite numbered rules — matches the cli-spec.md pattern for F6.
 
-**Architecture-law watch:** control_plane may import `attestable_engine`; engine
+**Architecture-law watch:** control_plane may import `provenire_engine`; engine
 and cli must never import control_plane. The SSRF guard the engine deliberately
 omits (detection-rules-spec §1) lives here.
 
 ## 1. Architect design (2026-07-04)
 
-### Modules (`packages/control_plane/src/attestable_control_plane/api/`)
+### Modules (`packages/control_plane/src/provenire_control_plane/api/`)
 - `models.py` — Pydantic `ScanRequest` (target, transport default `streamable_http`, mode default `deterministic`), `ScanResponse`, `ErrorResponse`.
 - `ssrf.py` — **the P0.** `IPClassifier` (globally-routable vs blocked, via `ipaddress` stdlib; S1–S3.1 incl. IPv4-mapped IPv6), `resolve_target(host, resolver)`, `validate_ssrf(url, resolver)` → raises `BlockedTarget`/`InvalidTarget`. Resolver injected (no real DNS in tests).
 - `rate_limit.py` — `RateLimiter` ABC + `InMemoryRateLimiter(limit=30, window=3600, clock=time.time)`; `check_and_record(ip) -> (remaining, limit, reset)`; clock injectable.
@@ -78,8 +78,8 @@ fails (canonical "no code yet" red):
 ```
 ERROR collecting packages/control_plane/tests/test_api.py
   packages/control_plane/tests/test_api.py:22: in <module>
-      from attestable_control_plane.api.app import create_app
-  E   ModuleNotFoundError: No module named 'attestable_control_plane.api.app'
+      from provenire_control_plane.api.app import create_app
+  E   ModuleNotFoundError: No module named 'provenire_control_plane.api.app'
 !!! Interrupted: 1 error during collection !!!
 ```
 
@@ -97,7 +97,7 @@ guards (ssrf/rate_limit/errors):
   (A4) → mode (A5, semantic→402) → **SSRF resolve+classify before any socket
   (S1-S6.1)** → rate-limit (R1) → engine F1→F5 pipeline under one
   `asyncio.wait_for(timeout)` (S5) → shape 200 + `X-RateLimit-*` (A6-A11/R2).
-  Reuses `attestable_engine` unchanged (same pipeline the CLI drives). Engine
+  Reuses `provenire_engine` unchanged (same pipeline the CLI drives). Engine
   `TargetUnreachable`/`TimeoutError` → api `TargetUnreachable` 408 with a fixed,
   secret-free message (E6). Findings `entity`/`rationale` run through
   `safe_message` (hostile-server text).

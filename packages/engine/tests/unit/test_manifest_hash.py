@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from attestable_engine.enumerate.manifest import (
+from provenire_engine.enumerate.manifest import (
     PromptRecord,
     ResourceRecord,
     ToolRecord,

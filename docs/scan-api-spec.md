@@ -5,7 +5,7 @@
 > source. Tests derive from the numbered rules here (test-first law, CLAUDE.md).
 >
 > **Layer:** `control_plane` (proprietary). Engine and CLI must **never** import
-> control_plane (architecture law). control_plane *may* import `attestable_engine`.
+> control_plane (architecture law). control_plane *may* import `provenire_engine`.
 >
 > **Scope of F7 (this loop trip):** `POST /scan` only — synchronous scan + SSRF
 > guard + rate limit. **No persistence.** `GET /scan/{id}`, report retrieval,

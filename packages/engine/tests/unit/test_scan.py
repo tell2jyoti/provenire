@@ -7,8 +7,8 @@ from typing import Any, Callable
 
 import pytest
 
-from attestable_engine import Transport, scan
-from attestable_engine.connect.errors import TargetUnreachable
+from provenire_engine import Transport, scan
+from provenire_engine.connect.errors import TargetUnreachable
 
 
 def test_initialize_before_enumeration(
