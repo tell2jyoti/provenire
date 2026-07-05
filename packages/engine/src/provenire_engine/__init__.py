@@ -1,4 +1,4 @@
-"""Attestable engine — framework-neutral MCP detection (open core)."""
+"""Provenire engine — framework-neutral MCP detection (open core)."""
 
 from __future__ import annotations
 

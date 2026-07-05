@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 import pytest
 
-from attestable_engine import Finding, PromptRecord, ResourceRecord, ToolRecord, detect_poisoning
+from provenire_engine import Finding, PromptRecord, ResourceRecord, ToolRecord, detect_poisoning
 
 MakeManifest = Callable[..., Any]
 

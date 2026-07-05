@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Attestable — Technical Design &amp; Architecture (v1.0)</title>
+<title>Provenire — Technical Design &amp; Architecture (v1.0)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -83,7 +83,7 @@
 <header class="masthead">
   <div class="wrap">
     <p class="eyebrow">Technical Design Document · System Architecture · API Spec</p>
-    <h1>Attestable — TDD</h1>
+    <h1>Provenire — TDD</h1>
     <p class="tagline">How the MCP compliance-evidence platform is built and deployed: a build-the-core / buy-the-rest architecture on a single AWS box, costed to stay free at launch.</p>
     <dl class="docmeta">
       <div><dt>Version</dt><dd>1.1 (pack-based)</dd></div>
@@ -121,7 +121,7 @@
   <section id="s1">
     <span class="sec-num">SECTION 01</span>
     <h2>Scope &amp; context</h2>
-    <p class="lead">This document specifies how Attestable (see PRD v1.1) is engineered and deployed for <strong>Phase 1</strong>: the free, open MCP security scanner plus the foundations of the paid control plane.</p>
+    <p class="lead">This document specifies how Provenire (see PRD v1.1) is engineered and deployed for <strong>Phase 1</strong>: the free, open MCP security scanner plus the foundations of the paid control plane.</p>
     <p>It makes the explicit buy-vs-build decisions, selects AWS components, costs the deployment, defines the scanner engine and API, and sets the security and reliability posture. Phase 1 is <strong>framework-neutral</strong>: it ships the scanner plus a single generic <strong>baseline</strong> mapping pack. The mapping engine is data-driven, so Phase 2/3 features (named-framework packs, continuous monitoring, enforcement proxy) are designed for and add as <em>data</em>, not as engine rewrites. The governing constraints from the owner are honoured throughout: <em>EC2 for dev and prod; build only the core engine; buy the rest; do not over-invest in load balancing or observability; stay in budget so the free tier can ship.</em></p>
     <div class="callout qa">
       <p class="label">v1.1 amendment</p>
@@ -355,7 +355,7 @@
   <section id="s10">
     <span class="sec-num">SECTION 10</span>
     <h2>API specification (v1)</h2>
-    <p><strong>Base:</strong> <code>https://api.attestable.dev/v1</code> · <strong>Auth:</strong> public endpoints are anonymous + rate-limited (free portal); account endpoints use <code>Authorization: Bearer &lt;api_key&gt;</code>. <strong>Format:</strong> JSON. <strong>Rate limit (free):</strong> e.g. 30 scans/hr/IP, returned via <code>X-RateLimit-*</code> headers.</p>
+    <p><strong>Base:</strong> <code>https://api.provenire.dev/v1</code> · <strong>Auth:</strong> public endpoints are anonymous + rate-limited (free portal); account endpoints use <code>Authorization: Bearer &lt;api_key&gt;</code>. <strong>Format:</strong> JSON. <strong>Rate limit (free):</strong> e.g. 30 scans/hr/IP, returned via <code>X-RateLimit-*</code> headers.</p>
 
     <h3>POST /scan — start a scan</h3>
     <pre><span class="c">// request</span>
@@ -460,7 +460,7 @@
     </ul>
 
     <div class="footer">
-      <p>Attestable · TDD v1.0 · QA-passed draft for owner review · companion to PRD v1.0<br>
+      <p>Provenire · TDD v1.0 · QA-passed draft for owner review · companion to PRD v1.0<br>
       Pricing (AWS us-east-1, mid-2026) and MCP SDK behaviour should be re-verified at build time. Figures provisional; not financial advice.</p>
     </div>
   </section>

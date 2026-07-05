@@ -5,7 +5,7 @@
 > Condensation of the normative text — the URL is authoritative. Re-pin per
 > `docs/references/INDEX.md`. Read alongside `mcp-security-best-practices.md`.
 
-Relevant to Attestable's control-plane scan API (**F7**) and to the
+Relevant to Provenire's control-plane scan API (**F7**) and to the
 security-reviewer when judging auth handling.
 
 ## Scope

@@ -29,7 +29,7 @@ stub; the TDD it would distill from is not in-repo):
 **Architecture law (the headline for F8):** detection ≠ mapping. The engine stays
 framework-neutral (`finding_type` only); *all* control/regulation naming lives in
 `control_plane/packs/*.yaml` as **data, not code**. control_plane may import
-`attestable_engine`; engine/cli must never import control_plane.
+`provenire_engine`; engine/cli must never import control_plane.
 
 ## Loop progress (blueprint §06)
 
@@ -43,7 +43,7 @@ framework-neutral (`finding_type` only); *all* control/regulation naming lives i
 
 ## 1. Architect design (2026-07-04)
 
-### Modules (`packages/control_plane/src/attestable_control_plane/mapping/`)
+### Modules (`packages/control_plane/src/provenire_control_plane/mapping/`)
 - `pack.py` — `Control(id, title, breached_by)`, `PackRef(id, version)`,
   `Pack(pack: PackRef, controls: list[Control])` (all frozen), `PackError`, and
   `load_pack(yaml_text) -> Pack` (yaml.safe_load + M1–M4 fail-closed validation).
@@ -92,7 +92,7 @@ human-approved commit.
 #1 `PackError` = single `Exception` subclass w/ message. #2 OQ-1 `evaluated_types`
 injected (no default) — engine taxonomy export deferred to F9. #3 baseline path via
 `importlib.resources`. #4 `ControlState` = `Literal`, not Enum (JSON-friendly).
-#5 breaching sort = alphabetical asc. #6 `from attestable_engine import Finding`.
+#5 breaching sort = alphabetical asc. #6 `from provenire_engine import Finding`.
 
 ## 2. Red proof
 
@@ -103,8 +103,8 @@ fails (canonical "no code yet" red):
 ```
 ERROR collecting packages/control_plane/tests/test_mapping.py
   packages/control_plane/tests/test_mapping.py:17: in <module>
-      from attestable_control_plane.mapping.evaluate import (
-  E   ModuleNotFoundError: No module named 'attestable_control_plane.mapping.evaluate'
+      from provenire_control_plane.mapping.evaluate import (
+  E   ModuleNotFoundError: No module named 'provenire_control_plane.mapping.evaluate'
 !!! Interrupted: 1 error during collection !!!
 ```
 
@@ -125,7 +125,7 @@ Implemented the 3 architect artifacts:
 - `packs/baseline.yaml` — B0–B5.
 
 **Structural decision (flag for human read):** the pack YAML lives *inside* the
-importable package at `src/attestable_control_plane/packs/baseline.yaml`, not the
+importable package at `src/provenire_control_plane/packs/baseline.yaml`, not the
 sibling `packages/control_plane/packs/` placeholder (which I removed). Reason:
 `importlib.resources` + wheel packaging require package data to sit inside the
 package; it is still logically "control_plane's packs" per the architecture law.
@@ -144,7 +144,7 @@ security + code reviewers re-verified.
 - CRITICAL claimed hatchling wouldn't ship `baseline.yaml` in the wheel (would
   need an explicit `include`). **Verified false by building the wheel**
   (`uv build --wheel packages/control_plane`) and inspecting it —
-  `attestable_control_plane/packs/baseline.yaml` is present; hatchling includes
+  `provenire_control_plane/packs/baseline.yaml` is present; hatchling includes
   non-`.py` data files inside the selected package dir by default. Reviewer
   **withdrew** the finding on the evidence. No change made.
 - Everything else clean: safe_load-only (no code exec / billion-laughs), fail-closed
@@ -171,7 +171,7 @@ mypy .` --strict clean.
 
 ## Decisions & open questions
 
-- **Pack location** = `src/attestable_control_plane/packs/baseline.yaml` (inside the
+- **Pack location** = `src/provenire_control_plane/packs/baseline.yaml` (inside the
   importable package), not the old sibling `packages/control_plane/packs/`
   placeholder (removed). Required for `importlib.resources` + wheel packaging;
   logically still "control_plane's packs" per the architecture law. Wheel build

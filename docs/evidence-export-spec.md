@@ -6,7 +6,7 @@
 > every test cites a rule id here.
 >
 > **Architecture law (CLAUDE.md / README):** control_plane may import
-> `attestable_engine` (Manifest, ScanResult, Finding) and the F8 mapping layer;
+> `provenire_engine` (Manifest, ScanResult, Finding) and the F8 mapping layer;
 > it must never import cli, and it names **no** regulation in code — the pack
 > id/version carried into the document is data from the pack.
 >

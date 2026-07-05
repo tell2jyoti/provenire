@@ -1,14 +1,14 @@
 # CLI Spec
 
-> The contract for the `attestable` command-line tool (feature F6, layer: cli).
+> The contract for the `provenire` command-line tool (feature F6, layer: cli).
 > This document is the source of the CLI's tests — every CLI test cites a rule id
 > here. Derived from TDD §03 (CLI is the only path for stdio & private servers),
 > §07 (engine pipeline), §10 (report artifacts); PRD FR-05 (local / no-egress),
 > FR-13 (CI exit codes); Blueprint §09 (F6 row: "stdio scan, exit codes, CI-fail
-> threshold") + `run: uv run attestable scan <url>`.
+> threshold") + `run: uv run provenire scan <url>`.
 >
 > **Layering.** The CLI lives in `packages/cli` (Apache-2.0, open). It imports the
-> engine's public API (`attestable_engine`) and **nothing from `control_plane`**
+> engine's public API (`provenire_engine`) and **nothing from `control_plane`**
 > (CLAUDE.md). It emits the engine's framework-neutral findings verbatim — it
 > **never** names a regulation.
 >
@@ -16,7 +16,7 @@
 
 ## 1. Purpose & scope
 
-`attestable scan <target>` connects to a live MCP server, runs the engine
+`provenire scan <target>` connects to a live MCP server, runs the engine
 pipeline (F1→F5: enumerate → detect → score → report) and exits with a
 CI-meaningful code. The CLI is the **sanctioned path for stdio and private /
 no-egress servers** (TDD §03, PRD FR-05): it runs the full scan locally and never
@@ -49,12 +49,12 @@ The public, unit-testable surface:
   `run_scan`, forwarding `connect`. The `connect` keyword is the injection seam
   (tests pass a fake; the real adapter is wired here later); it defaults to the
   C6 stub so the public `main(argv)` call is unchanged. The console entry point
-  `attestable` is `raise SystemExit(main())` (added to
+  `provenire` is `raise SystemExit(main())` (added to
   `packages/cli/pyproject.toml` `[project.scripts]`).
 
 ### 2.1 Rules
 
-- **C1 — Command & arguments.** `attestable scan <target>` with options:
+- **C1 — Command & arguments.** `provenire scan <target>` with options:
   - `--fail-on {critical,high,medium,low}` (default **`high`**) → passed to F4
     `score_findings(gate_threshold=...)`; sets the CI breach line.
   - `--timeout SECONDS` (float, default **`10.0`**) → engine R2 timeout.
@@ -109,7 +109,7 @@ The public, unit-testable surface:
 
 - **C6 — Deferred live connector.** `_default_connect` is a Phase-1 **stub**: it
   raises `TargetUnreachable` with a message that the transport adapter is not yet
-  wired (so `attestable scan x` today exits **3** with a clear reason, not a
+  wired (so `provenire scan x` today exits **3** with a clear reason, not a
   stack trace). The real stdio/streamable_http adapter lands with the transport
   slice and is covered by integration fixtures; unit tests inject their own
   `connect`. This is the one contract F6 stubs rather than implements.

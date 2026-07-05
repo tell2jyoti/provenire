@@ -5,14 +5,14 @@
 suite drives the API in-process with no live network or clock. Every `ApiError`
 is rendered to `{"error": {"code", "message"}}` with a safe message (E1-E6); a
 `RateLimited` additionally carries the `X-RateLimit-*` headers (R2). Imports
-attestable_engine (allowed) but never cli, and names no regulation.
+provenire_engine (allowed) but never cli, and names no regulation.
 """
 
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Sequence
 
-from attestable_engine.connect.session import Session, Transport
+from provenire_engine.connect.session import Session, Transport
 from fastapi import FastAPI
 from starlette.requests import Request
 from starlette.responses import JSONResponse

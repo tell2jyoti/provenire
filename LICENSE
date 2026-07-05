@@ -1,20 +1,20 @@
-Attestable — Licensing overview
+Provenire — Licensing overview
 Copyright (c) 2026 Jyoti (tell2jyoti@gmail.com)
 
-Attestable is an open-core project. Different parts of this repository are
+Provenire is an open-core project. Different parts of this repository are
 licensed differently — there is no single license covering the whole tree.
 
 Open core — Apache License 2.0
 ------------------------------
-  packages/engine   (attestable-engine)  — see packages/engine/LICENSE
-  packages/cli      (attestable-cli)      — see packages/cli/LICENSE
+  packages/engine   (provenire-engine)  — see packages/engine/LICENSE
+  packages/cli      (provenire-cli)      — see packages/cli/LICENSE
 
   These packages are free and open source under the Apache License, Version
   2.0. You may use, modify, and redistribute them under those terms.
 
 Commercial — Proprietary
 ------------------------
-  packages/control_plane  (attestable-control-plane) — see
+  packages/control_plane  (provenire-control-plane) — see
   packages/control_plane/LICENSE
 
   This package is proprietary and NOT covered by the Apache License. All rights

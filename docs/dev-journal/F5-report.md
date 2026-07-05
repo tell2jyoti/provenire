@@ -78,13 +78,13 @@ missing public symbol (`report/__init__.py` was empty):
 
 ```
 ImportError while importing test module '.../tests/unit/test_report.py'.
-E   ImportError: cannot import name 'build_report' from 'attestable_engine'
+E   ImportError: cannot import name 'build_report' from 'provenire_engine'
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 ```
 
 ## 3 + 4. Green & refactor
 
-Implemented `src/attestable_engine/report/builder.py`:
+Implemented `src/provenire_engine/report/builder.py`:
 - Frozen `Report(json: str, html: str)` + public `build_report(manifest, result,
   *, schema_version="1.0")`.
 - `_payload` builds the RP1 dict (schema_version, manifest_hash, transport,

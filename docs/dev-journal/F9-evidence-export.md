@@ -26,7 +26,7 @@ the recommended option:
    when/which-run provenance yet stays deterministic-given-inputs. Matches F5
    keeping the clock out of the pure core.
 
-**Architecture law:** control_plane imports `attestable_engine` (Manifest,
+**Architecture law:** control_plane imports `provenire_engine` (Manifest,
 ScanResult, Finding) + F8 mapping; never cli; **no regulation named in code** —
 the pack id/version is data carried through from the pack.
 
@@ -90,8 +90,8 @@ fails (canonical "no code yet" red):
 ```
 ERROR collecting packages/control_plane/tests/test_evidence.py
   packages/control_plane/tests/test_evidence.py:22: in <module>
-      from attestable_control_plane.evidence.bundle import Evidence, build_evidence
-  E   ModuleNotFoundError: No module named 'attestable_control_plane.evidence.bundle'
+      from provenire_control_plane.evidence.bundle import Evidence, build_evidence
+  E   ModuleNotFoundError: No module named 'provenire_control_plane.evidence.bundle'
 !!! Interrupted: 1 error during collection !!!
 ```
 

@@ -5,7 +5,7 @@ Driven in-process via Starlette TestClient — no live port, no real DNS, no wal
 clock. The engine's F1->F5 pipeline is reused unchanged; the API is exercised
 against an injected in-memory `connect` (fake Session), an injected DNS resolver
 (deterministic IPs), and an injectable rate-limiter clock. Every test cites the
-spec rule it derives from. control_plane imports attestable_engine (allowed);
+spec rule it derives from. control_plane imports provenire_engine (allowed);
 nothing here imports cli, and no regulation is named (architecture law).
 """
 
@@ -19,17 +19,17 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from attestable_control_plane.api.app import create_app
-from attestable_control_plane.api.errors import (
+from provenire_control_plane.api.app import create_app
+from provenire_control_plane.api.errors import (
     BlockedTarget,
     InvalidTarget,
     RateLimited,
     safe_message,
 )
-from attestable_control_plane.api.rate_limit import InMemoryRateLimiter
-from attestable_control_plane.api.ssrf import is_blocked, resolve_and_validate
-from attestable_engine import TargetUnreachable
-from attestable_engine.connect.session import Session, Transport
+from provenire_control_plane.api.rate_limit import InMemoryRateLimiter
+from provenire_control_plane.api.ssrf import is_blocked, resolve_and_validate
+from provenire_engine import TargetUnreachable
+from provenire_engine.connect.session import Session, Transport
 
 Connect = Callable[[str, Transport, float], Awaitable[Session]]
 Resolver = Callable[[str], Sequence[str]]

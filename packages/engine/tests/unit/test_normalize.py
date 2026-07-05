@@ -5,7 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import Any, Callable
 
-from attestable_engine.enumerate.normalize import (
+from provenire_engine.enumerate.normalize import (
     to_prompt_record,
     to_resource_record,
     to_tool_record,

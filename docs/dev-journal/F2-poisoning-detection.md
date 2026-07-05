@@ -64,18 +64,18 @@ not exist):
 
 ```
 ImportError while importing test module '.../tests/unit/test_poisoning.py'
-E   ImportError: cannot import name 'Finding' from 'attestable_engine'
-    (.../src/attestable_engine/__init__.py)
+E   ImportError: cannot import name 'Finding' from 'provenire_engine'
+    (.../src/provenire_engine/__init__.py)
 ImportError while importing test module '.../tests/unit/test_finding_model.py'
-E   ImportError: cannot import name 'Finding' from 'attestable_engine'
+E   ImportError: cannot import name 'Finding' from 'provenire_engine'
 !!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
 ```
 
 ## 3 + 4. Green & refactor
 
 Implemented:
-- `src/attestable_engine/finding.py` — `Finding` frozen dataclass (§2.2).
-- `src/attestable_engine/detect/poisoning.py` — `detect_poisoning` + three pure
+- `src/provenire_engine/finding.py` — `Finding` frozen dataclass (§2.2).
+- `src/provenire_engine/detect/poisoning.py` — `detect_poisoning` + three pure
   rule checks (`_check_invisible_unicode` / `_check_directive` /
   `_check_exfiltration`) over `_scanned_entities`. P1 uses unicode category
   `Cc`/`Cf` minus `\t\n\r` (covers the spec's explicit zero-width/bidi/tags

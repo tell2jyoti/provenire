@@ -1,21 +1,21 @@
 [project]
-name = "attestable-cli"
+name = "provenire-cli"
 version = "0.1.0"
-description = "Attestable — command-line wrapper around the detection engine (open core)."
+description = "Provenire — command-line wrapper around the detection engine (open core)."
 requires-python = ">=3.11"
 license = "Apache-2.0"
-dependencies = ["attestable-engine"]
+dependencies = ["provenire-engine"]
 
-# The `attestable` console script (F6): `attestable scan <target>`.
+# The `provenire` console script (F6): `provenire scan <target>`.
 [project.scripts]
-attestable = "attestable_cli.cli:_console"
+provenire = "provenire_cli.cli:_console"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/attestable_cli"]
+packages = ["src/provenire_cli"]
 
 [tool.uv.sources]
-attestable-engine = { workspace = true }
+provenire-engine = { workspace = true }

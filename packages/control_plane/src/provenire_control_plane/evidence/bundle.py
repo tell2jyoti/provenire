@@ -19,8 +19,8 @@ import json
 from dataclasses import dataclass
 from typing import Any
 
-from attestable_engine import Finding, Manifest, ScanResult
-from attestable_engine.finding import Severity
+from provenire_engine import Finding, Manifest, ScanResult
+from provenire_engine.finding import Severity
 
 from ..mapping.evaluate import ControlResult, EvaluationResult
 

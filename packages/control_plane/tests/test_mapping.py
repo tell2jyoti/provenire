@@ -4,7 +4,7 @@ Rules M1-M14 (pack format + mapping-engine semantics), B0-B5 (baseline pack
 content). Every test cites the rule it derives from. The pack is data, not code:
 `finding_type`s (framework-neutral, from the engine) map to vendor-neutral
 controls in `packs/*.yaml`; no regulation is named in code (architecture law).
-control_plane imports `attestable_engine` (allowed); nothing here imports cli.
+control_plane imports `provenire_engine` (allowed); nothing here imports cli.
 """
 
 from __future__ import annotations
@@ -12,14 +12,14 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 import pytest
-from attestable_engine import Finding
+from provenire_engine import Finding
 
-from attestable_control_plane.mapping.evaluate import (
+from provenire_control_plane.mapping.evaluate import (
     ControlResult,
     EvaluationResult,
     evaluate_pack,
 )
-from attestable_control_plane.mapping.pack import (
+from provenire_control_plane.mapping.pack import (
     Control,
     Pack,
     PackError,

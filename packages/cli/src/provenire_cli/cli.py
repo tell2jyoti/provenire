@@ -1,6 +1,6 @@
-"""The `attestable` CLI (cli-spec §2, feature F6, layer: cli).
+"""The `provenire` CLI (cli-spec §2, feature F6, layer: cli).
 
-Wires the engine's F1→F5 pipeline behind ``attestable scan <target>`` and exits
+Wires the engine's F1→F5 pipeline behind ``provenire scan <target>`` and exits
 with a CI-meaningful code (FR-13). The CLI is the sanctioned path for stdio /
 private servers (FR-05): it scans locally and never transmits the manifest.
 
@@ -10,7 +10,7 @@ unit tests supply an in-memory fake ``Session``; ``_default_connect`` is a stub
 until the transport slice lands (C6). Everything from a connected session onward
 is implemented and unit-tested here.
 
-Imports only ``attestable_engine`` (open core) — never ``control_plane``
+Imports only ``provenire_engine`` (open core) — never ``control_plane``
 (architecture law) — and names no regulation.
 """
 
@@ -22,7 +22,7 @@ import sys
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
-from attestable_engine import (
+from provenire_engine import (
     Report,
     ScanResult,
     TargetUnreachable,
@@ -32,8 +32,8 @@ from attestable_engine import (
     scan,
     score_findings,
 )
-from attestable_engine.connect.session import Session, Transport
-from attestable_engine.finding import Severity
+from provenire_engine.connect.session import Session, Transport
+from provenire_engine.finding import Severity
 
 Connect = Callable[[str, Transport, float], Awaitable[Session]]
 
@@ -152,7 +152,7 @@ def _write_artifacts(report: Report, output_dir: str) -> list[Path]:
 
 # --- argument parsing (cli-spec C1) ----------------------------------------
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="attestable", description="Scan a live MCP server.")
+    parser = argparse.ArgumentParser(prog="provenire", description="Scan a live MCP server.")
     sub = parser.add_subparsers(dest="command", required=True)
     scan_p = sub.add_parser("scan", help="Scan an MCP server and report findings.")
     scan_p.add_argument("target", help="MCP server target (URL or stdio command).")
@@ -187,7 +187,7 @@ def main(argv: list[str] | None = None, *, connect: Connect = _default_connect) 
 
 
 def _console() -> None:
-    """Console-script entry point (`attestable`)."""
+    """Console-script entry point (`provenire`)."""
     raise SystemExit(main())
 
 

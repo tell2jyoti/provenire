@@ -1,12 +1,12 @@
 [project]
-name = "attestable"
+name = "provenire"
 version = "0.1.0"
-description = "Attestable — MCP security + compliance-evidence platform (workspace root)."
+description = "Provenire — MCP security + compliance-evidence platform (workspace root)."
 requires-python = ">=3.11"
 dependencies = [
-    "attestable-engine",
-    "attestable-cli",
-    "attestable-control-plane",
+    "provenire-engine",
+    "provenire-cli",
+    "provenire-control-plane",
 ]
 
 # Virtual workspace root: aggregates the members below but is not itself built.
@@ -17,9 +17,9 @@ package = false
 members = ["packages/*"]
 
 [tool.uv.sources]
-attestable-engine = { workspace = true }
-attestable-cli = { workspace = true }
-attestable-control-plane = { workspace = true }
+provenire-engine = { workspace = true }
+provenire-cli = { workspace = true }
+provenire-control-plane = { workspace = true }
 
 [dependency-groups]
 dev = [

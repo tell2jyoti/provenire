@@ -117,7 +117,7 @@ def _parse_control(item: object) -> Control:
 def load_baseline() -> Pack:
     """Load the shipped `baseline` pack from package data (mapping-pack-spec §6)."""
     text = (
-        resources.files("attestable_control_plane")
+        resources.files("provenire_control_plane")
         .joinpath("packs", "baseline.yaml")
         .read_text(encoding="utf-8")
     )
