@@ -8,12 +8,14 @@
 ## Now
 
 - **Active feature:** **none — Phase 1 (F1–F9) COMPLETE.** F9 committed
-  (`0f01be6`). No feature is mid-flight.
+  (`0f01be6`). No feature is mid-flight. Interim work since: **Phase-1 PR #4
+  merged**, repo **rebranded** (attestable → provenire), README overhaul, and a
+  standalone **`demo/`** (two-act "watch it break, then watch us catch it") built.
 - **Loop step:** between phases. There is no F10 in the blueprint §09 backlog —
   next work is **Phase 2** (integration, not a single loop feature): see Next action.
-- **Branch:** `chore/agent-context-setup` (all of F1–F9 landed here). **Phase-1 PR
-  open: [#4](https://github.com/tell2jyoti/provenire/pull/4)** (`chore/agent-context-setup`
-  → `main`, F1–F9). Merge before starting Phase 2.
+- **Branch:** `docs/readme-overhaul` (README + rebrand + `demo/`). **Phase-1 PR
+  [#4](https://github.com/tell2jyoti/provenire/pull/4) MERGED** (`6da807b`), F1–F9
+  on `main`. `chore/agent-context-setup` retired.
 - **Last red:** F9 collection ModuleNotFoundError (`evidence.bundle`) — fixed green. ·
   **Last green:** F9, **461 passed**, ruff + mypy strict clean.
 - **Open findings:** none blocking. **Owner OQs** accumulating across F2–F5 logs
@@ -46,10 +48,12 @@
 - **Spec gate cleared:** `detection-rules-spec.md` §1/§2/§3.1 filled from the TDD
   (was a stub). Eyeball before trusting the tests.
 
-_Last updated: 2026-07-04 — F9 committed (`0f01be6`, 461 tests). **PHASE 1 COMPLETE
-(F1–F9):** open-core scanner (F1–F6) + control plane (F7 scan API + SSRF, F8 mapping
-engine + baseline pack, F9 evidence export). Next: Phase 2 integration (end-to-end
-wiring, live transport, persistence, signing, regulation packs) — see Next action._
+_Last updated: 2026-07-06 — built `demo/` (two-act break→catch demo; consumer only,
+no package change). PR #4 merged, repo rebranded, README overhauled. **PHASE 1
+COMPLETE (F1–F9):** open-core scanner (F1–F6) + control plane (F7 scan API + SSRF,
+F8 mapping engine + baseline pack, F9 evidence export). Next: Phase 2 integration
+(end-to-end wiring, live transport, persistence, signing, regulation packs) — see
+Next action._
 
 ## Phase-1 feature backlog (blueprint §09)
 
@@ -73,6 +77,18 @@ F1–F6 = open core / free scanner. F7–F9 = control plane.
 
 ## Phase log (most recent first)
 
+- **2026-07-06** — Built `demo/` (not a §09 feature; a consumer of the shipped
+  packages, no engine/control_plane change). Two-act demo: Act 1 a compromised
+  agent leaks a **decoy** secret to a **local mock sink** via a poisoned MCP tool
+  description; Act 2 runs the **real** engine + control_plane over the identical
+  server (in-memory `Session`) and flags `tool.poisoning` HIGH + `tool.exfiltration`
+  CRITICAL, writing a deterministic `out/evidence.json`. Ships `--safe-mode`
+  (no-LLM, reproducible) + a live LangGraph/stdio-MCP path (optional `[live]`
+  extra). Signatures verified against source + `packages/*/tests/`; import boundary
+  intact; ruff + mypy --strict clean on `demo/`; 461 package tests still green;
+  `python demo/run_demo.py` self-checks (non-zero exit if Act 2 misses the poison).
+  Prior interim work on this branch: PR #4 merge, attestable→provenire rebrand,
+  README overhaul.
 - **2026-07-04** — F9 (evidence export) committed (`0f01be6`, 461 tests) —
   **Phase 1 complete.** Pure, deterministic `build_evidence` assembles Manifest +
   ScanResult + F8 EvaluationResult into one self-contained JSON compliance record
