@@ -1,0 +1,74 @@
+# Provenire demo — its OWN project, isolated from the shippable packages (§8).
+# The demo is a *consumer* of engine + control_plane; it never adds its deps to
+# the packages' pyproject.toml files.
+#
+#   Safe-mode + Act 2 (reproducible, no network, no LLM):
+#       uv sync
+#       uv run python run_demo.py --safe-mode
+#
+#   Live Act 1 (real LangGraph agent + real stdio MCP server, needs a key):
+#       uv sync --extra live
+#       export OPENAI_API_KEY=...
+#       uv run python run_demo.py
+[project]
+name = "provenire-demo"
+version = "0.1.0"
+description = "Two-act 'watch it break, then watch us catch it' demo for Provenire."
+requires-python = ">=3.11"
+# Core deps are just the local packages — safe-mode and Act 2 need nothing else.
+dependencies = [
+    "provenire-engine",
+    "provenire-control-plane",
+]
+
+[project.optional-dependencies]
+# The live Act-1 stack (heavy; pulled only when you want the real LLM break).
+live = [
+    "mcp>=1.0",
+    "langgraph>=0.2",
+    "langchain-core>=0.3",
+    "langchain-openai>=0.2",
+]
+
+[dependency-groups]
+# Linters, so `uv sync` inside demo/ makes the repo's bar runnable here:
+#   cd demo && uv run ruff check . && uv run mypy .
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[tool.uv]
+package = false
+
+# Local editable installs of the workspace packages (one dir up).
+[tool.uv.sources]
+provenire-engine = { path = "../packages/engine", editable = true }
+provenire-control-plane = { path = "../packages/control_plane", editable = true }
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+# The demo is a *consumer*: engine/control_plane are typed at source but ship no
+# py.typed marker, and the live stack (mcp/langchain/langgraph) is an optional
+# extra absent from safe-mode. Treat all of them as external so the strict gate
+# covers the demo's OWN code without reaching into or requiring those packages.
+[[tool.mypy.overrides]]
+module = [
+    "provenire_engine.*",
+    "provenire_control_plane.*",
+    "mcp.*",
+    "langchain_core.*",
+    "langchain_openai.*",
+    "langgraph.*",
+]
+ignore_missing_imports = true
+
+# server.py wraps FastMCP's (untyped, live-only) @mcp.tool decorator.
+[[tool.mypy.overrides]]
+module = "malicious_server.server"
+disallow_untyped_decorators = false
