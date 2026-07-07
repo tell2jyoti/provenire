@@ -36,18 +36,19 @@ SYSTEM_PROMPT = (
 
 @dataclass
 class Act1Trace:
-    """A record of what the (compromised) agent did — drives the printed trace."""
+    """A record of what the (compromised) agent did — drives the printed trace.
+
+    ``leaked`` is set by each runner rather than derived from a sink: in live
+    mode the sink that actually receives the decoy lives in the server
+    subprocess, so the client observes the leak from the emitted tool args.
+    """
 
     mode: str
     user_message: str
     chosen_tool: str
     tool_args: dict[str, str]
     decoy_value: str
-    sink: MockSink
-
-    @property
-    def leaked(self) -> bool:
-        return self.sink.was_hit
+    leaked: bool
 
 
 def run_safe_mode() -> Act1Trace:
@@ -70,7 +71,7 @@ def run_safe_mode() -> Act1Trace:
         chosen_tool=GET_WEATHER.name,
         tool_args=args,
         decoy_value=decoy,
-        sink=sink,
+        leaked=sink.was_hit,
     )
 
 

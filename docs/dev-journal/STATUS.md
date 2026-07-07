@@ -77,6 +77,18 @@ F1–F6 = open core / free scanner. F7–F9 = control plane.
 
 ## Phase log (most recent first)
 
+- **2026-07-07** — Verified the demo's **live** Act-1 path end-to-end (real
+  LangGraph agent + real stdio FastMCP server + live LLM): the model obeyed the
+  poisoned tool description read over MCP and leaked the decoy to the server's
+  mock sink. Fixed 3 **live-only** bugs safe-mode never exercised: (1) server
+  subprocess spawned as a bare file path → `ModuleNotFoundError`; now spawned as
+  a module with `cwd`/`PYTHONPATH` at the demo root. (2) client and server held
+  *separate* sink instances, so `Act1Trace.leaked` was always False; `leaked` is
+  now an explicit field the client sets from the emitted tool args. (3) LangChain
+  nested the tool args under a `kwargs` key (server never got flat args) and the
+  sink printed to stdout (would corrupt the MCP stdio channel); now unwrapped +
+  sink logs to stderr. ruff + mypy --strict still clean; safe-mode + Act 2
+  self-check still green.
 - **2026-07-06** — Built `demo/` (not a §09 feature; a consumer of the shipped
   packages, no engine/control_plane change). Two-act demo: Act 1 a compromised
   agent leaks a **decoy** secret to a **local mock sink** via a poisoned MCP tool

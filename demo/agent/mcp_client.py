@@ -17,11 +17,11 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from malicious_server.tools import SANDBOX_DIR
-from sandbox.sink import MockSink
 
 if TYPE_CHECKING:
     from agent.app import Act1Trace
@@ -87,9 +87,16 @@ async def _run_async(
 
     from agent.app import Act1Trace
 
-    sink = MockSink()
-    server = Path(__file__).resolve().parent.parent / "malicious_server" / "server.py"
-    params = StdioServerParameters(command="python", args=[str(server)])
+    # Spawn the server as a *module* from the demo root so its own package
+    # imports (`malicious_server.tools`, `sandbox.sink`) resolve — running it as
+    # a bare file path would put only malicious_server/ on sys.path and crash it.
+    demo_root = Path(__file__).resolve().parent.parent
+    params = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "malicious_server.server"],
+        cwd=str(demo_root),
+        env={**os.environ, "PYTHONPATH": str(demo_root)},
+    )
 
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
@@ -97,7 +104,7 @@ async def _run_async(
             listed = await session.list_tools()
             lc_tools = [
                 _wrap_mcp_tool(deps, session, t) for t in listed.tools
-            ] + [_wrap_read_tool(deps, sink)]
+            ] + [_wrap_read_tool(deps)]
 
             llm = deps["ChatOpenAI"](model=model, temperature=temperature)
             agent = deps["create_react_agent"](llm, lc_tools)
@@ -111,13 +118,17 @@ async def _run_async(
             )
 
     chosen, args = _last_weather_call(state)
+    # The observable leak, client-side: the agent emitted the decoy as a tool
+    # argument. (The server subprocess's own sink also receives it and logs the
+    # RECEIVED line to stderr — that is the authentic exfil receipt.)
+    units = args.get("units", "")
     return Act1Trace(
         mode="live",
         user_message=user_message,
         chosen_tool=chosen,
         tool_args=args,
-        decoy_value=args.get("units", ""),
-        sink=sink,
+        decoy_value=units,
+        leaked=bool(units),
     )
 
 
@@ -125,6 +136,11 @@ def _wrap_mcp_tool(deps: dict[str, Any], session: Any, tool: Any) -> Any:
     """Wrap a remote MCP tool as a LangChain StructuredTool that calls it."""
 
     async def _call(**kwargs: Any) -> str:
+        # StructuredTool.from_function on a **kwargs callable exposes a single
+        # `kwargs` param, so the model nests the real args one level deep. Unwrap
+        # it so the server tool receives flat arguments (location/units).
+        if set(kwargs) == {"kwargs"} and isinstance(kwargs["kwargs"], dict):
+            kwargs = kwargs["kwargs"]
         result = await session.call_tool(tool.name, kwargs)
         return str(result.content)
 
@@ -135,7 +151,7 @@ def _wrap_mcp_tool(deps: dict[str, Any], session: Any, tool: Any) -> Any:
     )
 
 
-def _wrap_read_tool(deps: dict[str, Any], sink: MockSink) -> Any:
+def _wrap_read_tool(deps: dict[str, Any]) -> Any:
     """The local sandboxed read_file tool the agent uses to fetch the decoy."""
 
     def _read(path: str) -> str:
@@ -154,5 +170,8 @@ def _last_weather_call(state: Any) -> tuple[str, dict[str, str]]:
         for call in getattr(msg, "tool_calls", []) or []:
             if call.get("name") == "get_weather":
                 raw = call.get("args", {}) or {}
+                # Same one-level `kwargs` nesting as _wrap_mcp_tool._call.
+                if set(raw) == {"kwargs"} and isinstance(raw["kwargs"], dict):
+                    raw = raw["kwargs"]
                 return "get_weather", {k: str(v) for k, v in raw.items()}
     return "get_weather", {}
